@@ -4,6 +4,20 @@
 //
 
 #include "Mesh.h"
+#include <GL/glew.h>
+
+#include <iostream>
+#include <SFML/OpenGL.hpp>
+#include <SFML/Graphics.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include <glm/matrix.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <chrono>
 
 Mesh::Mesh() {
     // do nothing
@@ -26,10 +40,7 @@ bool Mesh::loadMesh(const std::string& path) {
 bool Mesh::initFromScene(const aiScene* pScene) {
     this->meshy = pScene->mMeshes[0];
     pScene->mMaterials[this->meshy->mMaterialIndex]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath, NULL, NULL, NULL, NULL, NULL);
-    return true;
-}
 
-void Mesh::render() {
     sf::Image img_data;
     if (!img_data.loadFromFile(texturePath.C_Str())) {
         std::cout << "Could not load " <<  texturePath.C_Str() << std::endl;
@@ -85,6 +96,9 @@ void Mesh::render() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbufferthingo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexs.size() * sizeof(unsigned int), &indexs[0], GL_STATIC_DRAW);
     numFaces = meshy->mNumFaces;
+
+
+    return true;
 }
 
 void Mesh::draw() {

@@ -4,6 +4,15 @@
 #include <iostream>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include <glm/matrix.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <chrono>
 
 #ifdef __linux__
 #include <X11/Xlib.h>
@@ -24,9 +33,9 @@ void renderingThread(sf::Window* window) {
 
     const GLuint shaderProgram = glCreateProgram();
     GLchar const* vssource =
-            "#version 300 es\n"
-                    "layout (location = 0) in vec3 aPos;"
-                    "layout (location = 1) in vec2 texCoord;"
+            "#version 130\n"
+                    "in vec3 aPos;"
+                    "in vec2 texCoord;"
                     ""
                     "out vec3 ourColor;"
                     "out vec2 texCoordV;"
@@ -50,10 +59,10 @@ void renderingThread(sf::Window* window) {
     }
 
     GLchar const* fssource =
-            "#version 300 es\n"
-                    "out mediump vec4 FragColor;"
+            "#version 130\n"
+                    "out vec4 FragColor;"
                     ""
-                    "in mediump vec2 texCoordV;"
+                    "in vec2 texCoordV;"
                     ""
                     "uniform sampler2D ourTexture;"
                     ""
@@ -128,7 +137,6 @@ void renderingThread(sf::Window* window) {
         x.LoadMesh("assets/tile2.fbx");
         x.Render(); */
 
-        object.render();
         object.draw();
 
         window->display();
