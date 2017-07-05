@@ -19,7 +19,7 @@ void renderingThread(sf::Window* window) {
 
     const GLuint shaderProgram = glCreateProgram();
     GLchar const* vssource =
-            "#version 330 core\n"
+            "#version 300 es\n"
                     "layout (location = 0) in vec3 aPos;"
                     "layout (location = 1) in vec2 texCoord;"
                     ""
@@ -41,14 +41,14 @@ void renderingThread(sf::Window* window) {
     glGetShaderiv(VS, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(VS, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FIAILED\n" << infoLog << std::endl;
+        std::cout << "rip shader comperino 1\n" << infoLog << std::endl;
     }
 
     GLchar const* fssource =
-            "#version 330 core\n"
-                    "out vec4 FragColor;"
+            "#version 300 es\n"
+                    "out mediump vec4 FragColor;"
                     ""
-                    "in vec2 texCoordV;"
+                    "in mediump vec2 texCoordV;"
                     ""
                     "uniform sampler2D ourTexture;"
                     ""
@@ -62,7 +62,7 @@ void renderingThread(sf::Window* window) {
     glGetShaderiv(FS, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(FS, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FIAILED\n" << infoLog << std::endl;
+        std::cout << "rip shader comperino 2\n" << infoLog << std::endl;
     }
 
     glAttachShader(shaderProgram, VS);
@@ -81,7 +81,7 @@ void renderingThread(sf::Window* window) {
     auto t_start = std::chrono::high_resolution_clock::now();
 
     Mesh object;
-    object.loadMesh("assets/tile1.fbx");
+    object.loadMesh("assets/tile2.fbx");
 
     GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
     glm::mat4 trans;
@@ -120,7 +120,7 @@ void renderingThread(sf::Window* window) {
 
         //object.draw();
         /* Mesh x;
-        x.LoadMesh("assets/tile1.fbx");
+        x.LoadMesh("assets/tile2.fbx");
         x.Render(); */
 
         object.render();
@@ -132,7 +132,7 @@ void renderingThread(sf::Window* window) {
 }
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(24));
+    sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
 
     GLenum res = glewInit();
     if (res != GLEW_OK) {
