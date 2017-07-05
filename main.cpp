@@ -4,6 +4,11 @@
 #include <iostream>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics.hpp>
+
+#ifdef __linux__
+#include <X11/Xlib.h>
+#endif
+
 #include "Mesh.h"
 
 void renderingThread(sf::Window* window) {
@@ -132,6 +137,10 @@ void renderingThread(sf::Window* window) {
 }
 
 int main() {
+#ifdef __linux__
+    XInitThreads();
+#endif
+
     sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
 
     GLenum res = glewInit();
