@@ -10,18 +10,19 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include <chrono>
-
-#ifdef __linux__
-#include <X11/Xlib.h>
-#endif
 
 #include "Mesh.h"
 
-void renderingThread(sf::Window* window) {
-    window->setActive(true);
+int main() {
+    sf::Window window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
+    GLenum res = glewInit();
+    if (res != GLEW_OK) {
+        fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
+        return 1;
+    }
+
+    window.setActive(true);
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
@@ -86,7 +87,7 @@ void renderingThread(sf::Window* window) {
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FIAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
     glUseProgram(shaderProgram);
     glDeleteShader(VS);
@@ -113,63 +114,33 @@ void renderingThread(sf::Window* window) {
     GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
-
-    while (window->isOpen()) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glEnableVertexAttribArray(0);
-        //glEnableVertexAttribArray(1);
-        // Calculate transformation
-        float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
-
-        trans = glm::rotate(
-                trans,
-                time * glm::radians(5.0f),
-                glm::vec3(0.0f, 0.0f, 1.0f)
-        );
-        glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
-        //glBindTexture(GL_TEXTURE_2D, texture_handle);
-        //glDrawElements(GL_TRIANGLES, numFaces * 3 * 3, GL_UNSIGNED_INT, 0);
-        //glDisableVertexAttribArray(0);
-        //glDisableVertexAttribArray(1);
-
-        //object.draw();
-        /* Mesh x;
-        x.LoadMesh("assets/tile2.fbx");
-        x.Render(); */
-
-        object.draw();
-
-        window->display();
-        sf::sleep(sf::milliseconds(5));
-    }
-}
-
-int main() {
-#ifdef __linux__
-    XInitThreads();
-#endif
-
-    sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
-
-    GLenum res = glewInit();
-    if (res != GLEW_OK) {
-        fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
-        return 1;
-    }
-
-    window.setActive(false);
-
-    sf::Thread thread(&renderingThread, &window);
-    thread.launch();
-
     bool running = true;
     while (running) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+            if (event.type == sf::Event::Closed)
+            {
+                // end the program
                 running = false;
             }
+            else if (event.type == sf::Event::Resized)
+            {
+                // adjust the viewport when the window is resized
+                glViewport(0, 0, event.size.width, event.size.height);
+            }
         }
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
+
+        trans = glm::rotate(
+                trans,
+                time * glm::radians(.15f),
+                glm::vec3(0.0f, 0.0f, 1.0f)
+        );
+        glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
+
+        object.draw();
+        window.display();
     }
 
     window.close();
