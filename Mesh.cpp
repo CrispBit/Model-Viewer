@@ -20,6 +20,14 @@ Mesh::MeshEntry::MeshEntry()
     materialIndex = INVALID_MATERIAL;
 };
 
+Mesh::MeshEntry::MeshEntry(MeshEntry&& m) : VB(m.VB), IB(m.IB),
+                    numIndices(m.numIndices), materialIndex(m.materialIndex){
+    m.VB = INVALID_OGL_VALUE;
+    m.IB = INVALID_OGL_VALUE;
+    m.numIndices  = 0;
+    m.materialIndex = INVALID_MATERIAL;
+}
+
 Mesh::MeshEntry::~MeshEntry()
 {
     if (VB != INVALID_OGL_VALUE)
