@@ -49,6 +49,7 @@ private:
 
     struct MeshEntry{
         MeshEntry();
+        MeshEntry(MeshEntry&& m);
         ~MeshEntry();
 
         bool Init(const std::vector<Vertex>& Vertices,
