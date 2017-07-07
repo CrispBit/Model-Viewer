@@ -3,16 +3,17 @@
 //
 
 #ifndef TEXTURE_H
-#define	TEXTURE_H
+#define TEXTURE_H
 
+#include <GL/glew.h>
 #include <string>
 #include <SFML/Graphics.hpp>
 
-#include <GL/glew.h>
 
 class Texture {
 public:
     Texture(GLenum textureTarget, const std::string& fileName);
+    ~Texture() {}
     bool load();
     void bind(GLenum TextureUnit);
 private:

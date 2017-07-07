@@ -2,6 +2,8 @@
 // Created by cilan on 7/6/2017.
 //
 
+#include <GL/glew.h>
+#include <SFML/OpenGL.hpp>
 #include <iostream>
 #include "Texture.h"
 
