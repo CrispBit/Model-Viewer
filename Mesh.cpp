@@ -95,7 +95,7 @@ bool Mesh::initMaterials(const aiScene* pScene) {
 bool Mesh::initFromScene(const aiScene* pScene) {
     for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         aiMesh* meshy = pScene->mMeshes[i];
-        MeshEntry entry;
+        std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
         std::vector<Vertex> vaortishes;
         std::vector<GLuint> indexs;
         unsigned int vertices = meshy->mNumVertices;
@@ -114,9 +114,9 @@ bool Mesh::initFromScene(const aiScene* pScene) {
             indexs.push_back(fase.mIndices[2]);
         }
 
-        entry.materialIndex = meshy->mMaterialIndex;
+        entry->materialIndex = meshy->mMaterialIndex;
 
-        entry.Init(vaortishes, indexs);
+        entry->Init(vaortishes, indexs);
 
         m_Entries.push_back(std::move(entry));
     }
@@ -171,16 +171,16 @@ void Mesh::draw() {
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    for (unsigned int i = 0; i < m_Entries.size(); ++i) {
-        glBindBuffer(GL_ARRAY_BUFFER, m_Entries[i].VB);
+    for (const auto &mesh : m_Entries) {
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);                 // position
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12); // texture coordinate
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Entries[i].IB);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IB);
 
-        m_Textures[m_Entries[i].materialIndex]->bind(GL_TEXTURE0);
-        glDrawElements(GL_TRIANGLES, m_Entries[i].numIndices, GL_UNSIGNED_INT, 0);
+        m_Textures[mesh->materialIndex]->bind(GL_TEXTURE0);
+        glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, 0);
     }
 
     glDisableVertexAttribArray(1);

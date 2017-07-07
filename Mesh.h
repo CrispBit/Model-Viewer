@@ -62,7 +62,7 @@ private:
         unsigned int materialIndex;
     };
 
-    std::vector<MeshEntry> m_Entries;
+    std::vector<std::unique_ptr<MeshEntry>> m_Entries;
     std::vector<std::unique_ptr<Texture>> m_Textures;
 };
 
