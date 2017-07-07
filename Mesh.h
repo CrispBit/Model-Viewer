@@ -13,6 +13,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <vector>
+#include <memory>
+#include "Texture.h"
+
+#define INVALID_OGL_VALUE 0xFFFFFFFF
 
 struct Vertex
 {
@@ -38,11 +43,26 @@ public:
     bool initFromScene(const aiScene* pScene);
     void draw();
 private:
-    GLuint texture_handle;
-    Assimp::Importer importer;
-    const aiMesh* meshy;
-    aiString texturePath;
-    int numFaces;
+    #define INVALID_MATERIAL 0xFFFFFFFF
+
+    bool initMaterials(const aiScene* pScene);
+
+    struct MeshEntry{
+        MeshEntry();
+        ~MeshEntry();
+
+        bool Init(const std::vector<Vertex>& Vertices,
+                  const std::vector<GLuint>& Indices);
+
+        GLuint VB;
+        GLuint IB;
+
+        GLuint numIndices;
+        unsigned int materialIndex;
+    };
+
+    std::vector<MeshEntry> m_Entries;
+    std::vector<std::unique_ptr<Texture>> m_Textures;
 };
 
 #endif

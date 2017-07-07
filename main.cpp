@@ -15,7 +15,7 @@
 #include "Mesh.h"
 
 int main() {
-    sf::Window window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
+    sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
     GLenum res = glewInit();
     if (res != GLEW_OK) {
         fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
