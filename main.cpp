@@ -131,7 +131,7 @@ int main() {
 
         trans = glm::rotate(
                 trans,
-                time * glm::radians(.15f),
+                time * glm::radians(.05f),
                 glm::vec3(0.0f, 0.0f, 1.0f)
         );
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
