@@ -14,24 +14,52 @@
 
 Mesh::MeshEntry::MeshEntry()
 {
+    VB = INVALID_OGL_VALUE;
+    IB = INVALID_OGL_VALUE;
     numIndices  = 0;
     baseVertex = 0;
-    baseIndex = 0;
     materialIndex = INVALID_MATERIAL;
 };
 
+Mesh::MeshEntry::~MeshEntry()
+{
+    if (VB != INVALID_OGL_VALUE)
+    {
+        glDeleteBuffers(1, &VB);
+    }
+
+    if (IB != INVALID_OGL_VALUE)
+    {
+        glDeleteBuffers(1, &IB);
+    }
+}
+
+bool Mesh::MeshEntry::Init(const std::vector<Vertex>& Vertices,
+                           const std::vector<GLuint>& Indices,
+                           const std::vector<VertexBoneData>& bones) {
+    numIndices = Indices.size();
+
+    glGenBuffers(1, &VB);
+    glBindBuffer(GL_ARRAY_BUFFER, VB);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &BONE_VB);
+    glBindBuffer(GL_ARRAY_BUFFER, BONE_VB);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(bones[0]) * bones.size(), &bones[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &IB);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * numIndices, &Indices[0], GL_STATIC_DRAW);
+
+    return true;
+}
+
 Mesh::Mesh() {
-    m_VAO = 0;
-    memset(&m_buffers, 0, sizeof(m_buffers));
-    m_numBones = 0;
-    m_pScene = NULL;
+    // do nothing
 }
 
 bool Mesh::loadMesh(const std::string& path) {
     bool ret = false;
-
-    glGenVertexArrays(1, &m_VAO);
-    glBindVertexArray(m_VAO);
 
     m_pScene = m_importer.ReadFile(path.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
@@ -233,14 +261,10 @@ glm::mat4 Mesh::boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Trans
     for (unsigned int i = 0 ; i < m_numBones ; i++) {
         Transforms[i] = m_boneInfo[i].finalTransformation;
     }
-
-    return Identity;
 }
 
 void Mesh::VertexBoneData::addBoneData(unsigned int boneID, float weight)
 {
-    //std::cout << boneID << std::endl;
-    //std::cout << weight << std::endl;
     for (unsigned int i = 0 ; i < sizeof(ids) / sizeof(*ids); ++i) {
         if (weights[i] == 0.0) {
             ids[i]     = boneID;
@@ -254,29 +278,24 @@ void Mesh::VertexBoneData::addBoneData(unsigned int boneID, float weight)
 }
 
 bool Mesh::initFromScene(const aiScene* pScene) {
-    std::vector<Vertex> vaortishes;
-    std::vector<GLuint> indexs;
-    std::vector<VertexBoneData> bones;
-
     m_Entries.resize(pScene->mNumMeshes);
 
-    unsigned int numVertices = 0,
-                 numIndices = 0;
+    unsigned int numVertices = 0;
 
     for (unsigned int i = 0; i < m_Entries.size(); i++) {
         std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
         entry->baseVertex = numVertices;
-        entry->baseIndex = numIndices;
         numVertices += pScene->mMeshes[i]->mNumVertices;
-        numIndices += entry->numIndices;
         entry->materialIndex = pScene->mMeshes[i]->mMaterialIndex;
-        m_Entries[i] = std::move(entry);
+        m_Entries.push_back(std::move(entry));
     }
-
-    bones.resize(numVertices);
 
     for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         aiMesh* meshy = pScene->mMeshes[i];
+        std::vector<Vertex> vaortishes;
+        std::vector<GLuint> indexs;
+        std::vector<VertexBoneData> bones;
+        bones.resize(meshy->mNumVertices);
         unsigned int vertices = meshy->mNumVertices;
         for (unsigned int j = 0; j < vertices; ++j) {
             const aiVector3D &potato = meshy->mVertices[j];
@@ -318,37 +337,84 @@ bool Mesh::initFromScene(const aiScene* pScene) {
                 bones[vId].addBoneData(boneIndex, weight);
             }
         }
+
+        m_Entries[i]->Init(vaortishes, indexs, bones);
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_buffers[POS_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vaortishes[0]) * vaortishes.size(), &vaortishes[0], GL_STATIC_DRAW);
+    /* this->meshy = pScene->mMeshes[0];
+    pScene->mMaterials[this->meshy->mMaterialIndex]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath, NULL, NULL, NULL, NULL, NULL);
+
+    sf::Image img_data;
+    if (!img_data.loadFromFile(texturePath.C_Str())) {
+        std::cout << "Could not load " <<  texturePath.C_Str() << std::endl;
+    }
+    glGenTextures(1, &texture_handle);
+    glBindTexture(GL_TEXTURE_2D, texture_handle);
+    glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_RGBA,
+            img_data.getSize().x, img_data.getSize().y,
+            0,
+            GL_RGBA, GL_UNSIGNED_BYTE, img_data.getPixelsPtr()
+    );
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
+
+    GLuint VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vaortishes.size(), &vaortishes[0], GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, vaortishes.size() * sizeof(glm::vec3), &vaortishes[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_buffers[BONE_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(bones[0]) * bones.size(), &bones[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
-    glVertexAttribIPointer(1, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);                 // position
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12); // texture coordinate
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_buffers[INDEX_BUFFER]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexs[0]) * indexs.size(), &indexs[0], GL_STATIC_DRAW);
+    GLuint indexbufferthingo;
+    glGenBuffers(1, &indexbufferthingo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbufferthingo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexs.size() * sizeof(unsigned int), &indexs[0], GL_STATIC_DRAW);
+    numFaces = meshy->mNumFaces; */
 
     return initMaterials(pScene);
 }
 
 void Mesh::draw() {
-    glBindVertexArray(m_VAO);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
+    glEnableVertexAttribArray(4);
 
     for (const auto &mesh : m_Entries) {
-        const unsigned int materialIndex = mesh->materialIndex;
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->BONE_VB);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);                 // position
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12); // texture coordinate
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20); // vector normals
+        glVertexAttribIPointer(3, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0); // bones
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16); // bone weights
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IB);
+
         m_Textures[mesh->materialIndex]->bind(GL_TEXTURE0);
-        glDrawElementsBaseVertex(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT,
-                                 (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
+        glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, 0);
     }
 
-    glBindVertexArray(0);
+    glDisableVertexAttribArray(4);
+    glDisableVertexAttribArray(3);
+    glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(0);
 
     // check OpenGL error
     GLenum err;
