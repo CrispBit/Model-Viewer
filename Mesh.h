@@ -45,6 +45,7 @@ public:
     void draw();
 private:
     #define INVALID_MATERIAL 0xFFFFFFFF
+    #define NUM_BONES_PER_VEREX 4
 
     unsigned int findRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     unsigned int findPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
@@ -64,8 +65,8 @@ private:
     unsigned int m_numBones = 0;
     struct VertexBoneData
     {
-        unsigned int ids[4];
-        float weights[4]; // same length as ids
+        unsigned int ids[NUM_BONES_PER_VEREX];
+        float weights[NUM_BONES_PER_VEREX];
 
         void addBoneData(unsigned int boneID, float weight);
 
@@ -75,21 +76,24 @@ private:
         }
     };
 
+    enum VB_TYPES {
+        INDEX_BUFFER,
+        POS_VB,
+        NORMAL_VB,
+        TEXCOORD_VB,
+        BONE_VB,
+        NUM_VBs
+    };
+
+    GLuint m_VAO;
+    GLuint m_buffers[NUM_VBs];
+
     struct MeshEntry{
         MeshEntry();
-        ~MeshEntry();
 
-        bool Init(const std::vector<Vertex>& Vertices,
-                  const std::vector<GLuint>& Indices,
-                  const std::vector<VertexBoneData>& bones);
-
-        GLuint VB;
-        GLuint IB;
-
-        GLuint BONE_VB;
-
-        GLuint numIndices;
+        unsigned int numIndices;
         unsigned int baseVertex;
+        unsigned int baseIndex;
         unsigned int materialIndex;
     };
 
