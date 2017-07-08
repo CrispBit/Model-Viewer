@@ -285,9 +285,12 @@ bool Mesh::initFromScene(const aiScene* pScene) {
         unsigned int vertices = meshy->mNumVertices;
         for (unsigned int j = 0; j < vertices; ++j) {
             const aiVector3D &potato = meshy->mVertices[j];
-            //const aiVector3D &n = meshy->mNormals[j];
+            const aiVector3D &n = meshy->mNormals[j];
             const aiVector3D &tc = meshy->HasTextureCoords(0) ? meshy->mTextureCoords[0][j] : aiVector3D(0,0,0);
-            vaortishes.push_back(Vertex(glm::vec3(potato.x, potato.y, potato.z), glm::vec2(tc.x, tc.y)));
+            vaortishes.push_back(Vertex(glm::vec3(potato.x, potato.y, potato.z),
+                                        glm::vec2(tc.x, tc.y),
+                                        glm::vec3(n.x, n.y, n.z)
+            ));
         }
 
         for (unsigned int j = 0; j < meshy->mNumFaces; ++j) {
@@ -380,12 +383,14 @@ bool Mesh::initFromScene(const aiScene* pScene) {
 void Mesh::draw() {
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     for (const auto &mesh : m_Entries) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);                 // position
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12); // texture coordinate
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20); // vector normals
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IB);
 
@@ -393,6 +398,7 @@ void Mesh::draw() {
         glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, 0);
     }
 
+    glDisableVertexAttribArray(2);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(0);
 
