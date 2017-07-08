@@ -157,10 +157,9 @@ int main() {
 
         std::vector<glm::mat4> Transforms;
         object.boneTransform(time, Transforms);
-        for (unsigned int i = 0; i < Transforms.size(); ++i)
-        {
+        for (unsigned int i = 0; i < Transforms.size(); ++i) {
             const std::string name = "gBones[" + std::to_string(i) + "]";
-            GLint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
+            GLuint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
             Transforms[i] = glm::transpose(Transforms[i]);
             glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i]));
         }
