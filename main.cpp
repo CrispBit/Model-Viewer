@@ -93,6 +93,10 @@ int main() {
     glDeleteShader(VS);
     glDeleteShader(FS);
 
+    glBindAttribLocation(shaderProgram, 0, "aPos");
+    glBindAttribLocation(shaderProgram, 1, "texCord");
+    glBindAttribLocation(shaderProgram, 2, "texCoordV");
+
     auto t_start = std::chrono::high_resolution_clock::now();
 
     Mesh object;
