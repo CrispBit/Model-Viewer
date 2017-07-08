@@ -58,7 +58,7 @@ int main() {
                     "   boneTransform += gBones[boneIDs[3]] * weights[3];"
                     ""
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * posL;"
+                    "   gl_Position = proj * view * model * vec4(aPos, 1.0);"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -105,7 +105,7 @@ int main() {
     glDeleteShader(FS);
 
     glBindAttribLocation(shaderProgram, 0, "aPos");
-    glBindAttribLocation(shaderProgram, 1, "texCord");
+    glBindAttribLocation(shaderProgram, 1, "texCoord");
     glBindAttribLocation(shaderProgram, 2, "normal");
     glBindAttribLocation(shaderProgram, 3, "boneIDs");
     glBindAttribLocation(shaderProgram, 4, "weights");
