@@ -111,6 +111,8 @@ int main() {
     glBindAttribLocation(shaderProgram, 3, "boneIDs");
     glBindAttribLocation(shaderProgram, 4, "weights");
 
+    glUseProgram(shaderProgram);
+
     auto t_start = std::chrono::high_resolution_clock::now();
 
     Mesh object;
@@ -131,8 +133,6 @@ int main() {
     glm::mat4 proj = glm::perspective(glm::radians(100.0f), 800.0f / 600.0f, 1.0f, 10.0f);
     GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
-
-    glUseProgram(shaderProgram);
 
     bool running = true;
     while (running) {

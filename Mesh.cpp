@@ -414,12 +414,6 @@ void Mesh::draw() {
     glDisableVertexAttribArray(2);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(0);
-
-    // check OpenGL error
-    GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        std::cout << "OpenGL error: " << err << std::endl;
-    }
 }
 
 const aiNodeAnim* Mesh::findNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
