@@ -106,6 +106,9 @@ int main() {
 
     glBindAttribLocation(shaderProgram, 0, "aPos");
     glBindAttribLocation(shaderProgram, 1, "texCord");
+    glBindAttribLocation(shaderProgram, 2, "normal");
+    glBindAttribLocation(shaderProgram, 3, "boneIDs");
+    glBindAttribLocation(shaderProgram, 4, "weights");
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
