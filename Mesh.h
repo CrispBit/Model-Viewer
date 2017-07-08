@@ -81,10 +81,12 @@ private:
 
         bool Init(const std::vector<Vertex>& Vertices,
                   const std::vector<GLuint>& Indices,
-                  const std::vector<VertexBoneData>& bones);
+                  const std::vector<VertexBoneData>& bone);
 
         GLuint VB;
         GLuint IB;
+
+        GLuint bVB;
 
         GLuint numIndices;
         unsigned int materialIndex;
