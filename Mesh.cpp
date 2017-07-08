@@ -287,7 +287,7 @@ bool Mesh::initFromScene(const aiScene* pScene) {
         entry->baseVertex = numVertices;
         numVertices += pScene->mMeshes[i]->mNumVertices;
         entry->materialIndex = pScene->mMeshes[i]->mMaterialIndex;
-        m_Entries.push_back(std::move(entry));
+        m_Entries[i] = std::move(entry);
     }
 
     for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
