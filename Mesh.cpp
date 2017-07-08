@@ -17,7 +17,6 @@ Mesh::MeshEntry::MeshEntry()
     VB = INVALID_OGL_VALUE;
     IB = INVALID_OGL_VALUE;
     numIndices  = 0;
-    baseVertex = 0;
     materialIndex = INVALID_MATERIAL;
 };
 
@@ -42,10 +41,6 @@ bool Mesh::MeshEntry::Init(const std::vector<Vertex>& Vertices,
     glGenBuffers(1, &VB);
     glBindBuffer(GL_ARRAY_BUFFER, VB);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
-
-    glGenBuffers(1, &BONE_VB);
-    glBindBuffer(GL_ARRAY_BUFFER, BONE_VB);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(bones[0]) * bones.size(), &bones[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &IB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
@@ -269,12 +264,12 @@ void Mesh::VertexBoneData::addBoneData(unsigned int boneID, float weight)
         if (weights[i] == 0.0) {
             ids[i]     = boneID;
             weights[i] = weight;
+            std::cout << i << std::endl;
             return;
         }
     }
 
-    // should never get here - more bones than we have space for
-    assert(0);
+    // ignore rest of bones
 }
 
 bool Mesh::initFromScene(const aiScene* pScene) {
@@ -284,7 +279,6 @@ bool Mesh::initFromScene(const aiScene* pScene) {
 
     for (unsigned int i = 0; i < m_Entries.size(); i++) {
         std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
-        entry->baseVertex = numVertices;
         numVertices += pScene->mMeshes[i]->mNumVertices;
         entry->materialIndex = pScene->mMeshes[i]->mMaterialIndex;
         m_Entries[i] = std::move(entry);
@@ -332,7 +326,7 @@ bool Mesh::initFromScene(const aiScene* pScene) {
             m_boneInfo[boneIndex].boneOffset = aiMatrix4x4ToGlm(&bone->mOffsetMatrix);
 
             for (unsigned int k = 0; k < bone->mNumWeights; k++) {
-                unsigned int vId = m_Entries[i]->baseVertex + bone->mWeights[k].mVertexId;
+                unsigned int vId = bone->mWeights[k].mVertexId;
                 float weight = bone->mWeights[k].mWeight;
                 bones[vId].addBoneData(boneIndex, weight);
             }
@@ -396,7 +390,6 @@ void Mesh::draw() {
 
     for (const auto &mesh : m_Entries) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->BONE_VB);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);                 // position
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12); // texture coordinate

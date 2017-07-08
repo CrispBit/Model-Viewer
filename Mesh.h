@@ -86,10 +86,7 @@ private:
         GLuint VB;
         GLuint IB;
 
-        GLuint BONE_VB;
-
         GLuint numIndices;
-        unsigned int baseVertex;
         unsigned int materialIndex;
     };
 
