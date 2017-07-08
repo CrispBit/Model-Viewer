@@ -16,6 +16,7 @@ Mesh::MeshEntry::MeshEntry()
 {
     VB = INVALID_OGL_VALUE;
     IB = INVALID_OGL_VALUE;
+    bVB = INVALID_OGL_VALUE;
     numIndices  = 0;
     materialIndex = INVALID_MATERIAL;
 };
@@ -413,6 +414,12 @@ void Mesh::draw() {
     glDisableVertexAttribArray(2);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(0);
+
+    // check OpenGL error
+    GLenum err;
+    while ((err = glGetError()) != GL_NO_ERROR) {
+        std::cout << "OpenGL error: " << err << std::endl;
+    }
 }
 
 const aiNodeAnim* Mesh::findNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)

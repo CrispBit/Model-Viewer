@@ -29,6 +29,7 @@ int main() {
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+
     int success;
     char infoLog[512];
 
