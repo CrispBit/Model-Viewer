@@ -26,10 +26,9 @@ struct Vertex
 
     Vertex() {}
 
-    Vertex(glm::vec3 pos, glm::vec2 tex)
+    Vertex(glm::vec3 pos, glm::vec2 tex) : m_pos(pos), m_tex(tex)
     {
-        m_pos = pos;
-        m_tex = tex;
+        // do nothing
     }
 };
 
@@ -45,11 +44,26 @@ public:
 private:
     #define INVALID_MATERIAL 0xFFFFFFFF
 
+    unsigned int findRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
+    unsigned int findPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
+    void calcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+    void calcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+    void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform);
+    glm::mat4 boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
+    unsigned int findScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
+    void calcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+    const aiNodeAnim* findNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
+
     bool initMaterials(const aiScene* pScene);
+    const aiScene* m_pScene;
+    Assimp::Importer m_importer;
+    aiMatrix4x4 m_GlobalInverseTransform;
+    std::map<std::string, unsigned int> m_boneMapping;
+
+    unsigned int m_numBones = 0;
 
     struct MeshEntry{
         MeshEntry();
-        MeshEntry(MeshEntry&& m);
         ~MeshEntry();
 
         bool Init(const std::vector<Vertex>& Vertices,
@@ -59,8 +73,31 @@ private:
         GLuint IB;
 
         GLuint numIndices;
+        unsigned int baseVertex;
         unsigned int materialIndex;
     };
+
+    struct VertexBoneData
+    {
+        unsigned int ids[50];
+        float weights[50]; // same length as ids
+
+        void addBoneData(unsigned int boneID, float weight);
+
+        VertexBoneData() {
+            memset(&ids, 0, sizeof(ids));
+            memset(&weights, 0, sizeof(weights));
+        }
+    };
+
+    struct BoneInfo
+    {
+        glm::mat4 boneOffset;
+        glm::mat4 finalTransformation;
+    };
+
+    std::vector<BoneInfo> m_boneInfo;
+    glm::mat4 m_globalInverseTransform;
 
     std::vector<std::unique_ptr<MeshEntry>> m_Entries;
     std::vector<std::unique_ptr<Texture>> m_Textures;

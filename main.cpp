@@ -96,7 +96,7 @@ int main() {
     auto t_start = std::chrono::high_resolution_clock::now();
 
     Mesh object;
-    object.loadMesh("assets/tile2.fbx");
+    object.loadMesh("assets/Spider_3.fbx");
 
     GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
     glm::mat4 trans;
@@ -110,7 +110,7 @@ int main() {
     GLint uniView = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
-    glm::mat4 proj = glm::perspective(glm::radians(40.0f), 800.0f / 600.0f, 1.0f, 10.0f);
+    glm::mat4 proj = glm::perspective(glm::radians(100.0f), 800.0f / 600.0f, 1.0f, 10.0f);
     GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
