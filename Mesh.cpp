@@ -35,13 +35,17 @@ Mesh::MeshEntry::~MeshEntry()
 }
 
 bool Mesh::MeshEntry::Init(const std::vector<Vertex>& Vertices,
-                           const std::vector<GLuint>& Indices)
-{
+                           const std::vector<GLuint>& Indices,
+                           const std::vector<VertexBoneData>& bones) {
     numIndices = Indices.size();
 
     glGenBuffers(1, &VB);
     glBindBuffer(GL_ARRAY_BUFFER, VB);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &BONE_VB);
+    glBindBuffer(GL_ARRAY_BUFFER, BONE_VB);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(bones[0]) * bones.size(), &bones[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &IB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
@@ -89,7 +93,6 @@ bool Mesh::initMaterials(const aiScene* pScene) {
 inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from)
 {
     glm::mat4 to;
-
 
     to[0][0] = (GLfloat)from->a1; to[0][1] = (GLfloat)from->b1;  to[0][2] = (GLfloat)from->c1; to[0][3] = (GLfloat)from->d1;
     to[1][0] = (GLfloat)from->a2; to[1][1] = (GLfloat)from->b2;  to[1][2] = (GLfloat)from->c2; to[1][3] = (GLfloat)from->d2;
@@ -262,7 +265,7 @@ glm::mat4 Mesh::boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Trans
 
 void Mesh::VertexBoneData::addBoneData(unsigned int boneID, float weight)
 {
-    for (unsigned int i = 0 ; i < sizeof(ids) / sizeof(*ids); i++) {
+    for (unsigned int i = 0 ; i < sizeof(ids) / sizeof(*ids); ++i) {
         if (weights[i] == 0.0) {
             ids[i]     = boneID;
             weights[i] = weight;
@@ -275,9 +278,20 @@ void Mesh::VertexBoneData::addBoneData(unsigned int boneID, float weight)
 }
 
 bool Mesh::initFromScene(const aiScene* pScene) {
+    m_Entries.resize(pScene->mNumMeshes);
+
+    unsigned int numVertices = 0;
+
+    for (unsigned int i = 0; i < m_Entries.size(); i++) {
+        std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
+        entry->baseVertex = numVertices;
+        numVertices += pScene->mMeshes[i]->mNumVertices;
+        entry->materialIndex = pScene->mMeshes[i]->mMaterialIndex;
+        m_Entries.push_back(std::move(entry));
+    }
+
     for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         aiMesh* meshy = pScene->mMeshes[i];
-        std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
         std::vector<Vertex> vaortishes;
         std::vector<GLuint> indexs;
         std::vector<VertexBoneData> bones;
@@ -301,14 +315,6 @@ bool Mesh::initFromScene(const aiScene* pScene) {
             indexs.push_back(fase.mIndices[2]);
         }
 
-        //entry->baseVertex = meshy->mNumVertices;
-        entry->baseVertex = 0;
-        entry->materialIndex = meshy->mMaterialIndex;
-
-        entry->Init(vaortishes, indexs);
-
-        m_Entries.push_back(std::move(entry));
-
         for (unsigned int j = 0; j < meshy->mNumBones; j++) {
             const aiBone* bone = meshy->mBones[j];
             unsigned int boneIndex = 0;
@@ -317,8 +323,7 @@ bool Mesh::initFromScene(const aiScene* pScene) {
             if (m_boneMapping.find(boneName) == m_boneMapping.end()) {
                 boneIndex = m_numBones;
                 m_numBones++;
-                BoneInfo bi;
-                m_boneInfo.push_back(std::move(bi));
+                m_boneInfo.push_back(BoneInfo());
             } else {
                 boneIndex = m_boneMapping[boneName];
             }
@@ -332,6 +337,8 @@ bool Mesh::initFromScene(const aiScene* pScene) {
                 bones[vId].addBoneData(boneIndex, weight);
             }
         }
+
+        m_Entries[i]->Init(vaortishes, indexs, bones);
     }
 
     /* this->meshy = pScene->mMeshes[0];
@@ -384,13 +391,18 @@ void Mesh::draw() {
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
+    glEnableVertexAttribArray(4);
 
     for (const auto &mesh : m_Entries) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->BONE_VB);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);                 // position
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12); // texture coordinate
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20); // vector normals
+        glVertexAttribIPointer(3, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0); // bones
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16); // bone weights
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IB);
 
@@ -398,6 +410,8 @@ void Mesh::draw() {
         glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, 0);
     }
 
+    glDisableVertexAttribArray(4);
+    glDisableVertexAttribArray(3);
     glDisableVertexAttribArray(2);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(0);

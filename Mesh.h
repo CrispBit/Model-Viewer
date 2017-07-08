@@ -39,6 +39,7 @@ public:
     Mesh();
     ~Mesh() {};
 
+    glm::mat4 boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
     bool loadMesh(const std::string& path);
     bool initFromScene(const aiScene* pScene);
     void draw();
@@ -50,7 +51,6 @@ private:
     void calcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void calcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform);
-    glm::mat4 boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
     unsigned int findScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     void calcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     const aiNodeAnim* findNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
@@ -62,26 +62,10 @@ private:
     std::map<std::string, unsigned int> m_boneMapping;
 
     unsigned int m_numBones = 0;
-
-    struct MeshEntry{
-        MeshEntry();
-        ~MeshEntry();
-
-        bool Init(const std::vector<Vertex>& Vertices,
-                  const std::vector<GLuint>& Indices);
-
-        GLuint VB;
-        GLuint IB;
-
-        GLuint numIndices;
-        unsigned int baseVertex;
-        unsigned int materialIndex;
-    };
-
     struct VertexBoneData
     {
-        unsigned int ids[50];
-        float weights[50]; // same length as ids
+        unsigned int ids[4];
+        float weights[4]; // same length as ids
 
         void addBoneData(unsigned int boneID, float weight);
 
@@ -89,6 +73,24 @@ private:
             memset(&ids, 0, sizeof(ids));
             memset(&weights, 0, sizeof(weights));
         }
+    };
+
+    struct MeshEntry{
+        MeshEntry();
+        ~MeshEntry();
+
+        bool Init(const std::vector<Vertex>& Vertices,
+                  const std::vector<GLuint>& Indices,
+                  const std::vector<VertexBoneData>& bones);
+
+        GLuint VB;
+        GLuint IB;
+
+        GLuint BONE_VB;
+
+        GLuint numIndices;
+        unsigned int baseVertex;
+        unsigned int materialIndex;
     };
 
     struct BoneInfo

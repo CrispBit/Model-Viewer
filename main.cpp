@@ -37,16 +37,28 @@ int main() {
             "#version 130\n"
                     "in vec3 aPos;"
                     "in vec2 texCoord;"
+                    "in vec3 normal;"
+                    "in ivec4 boneIDs;"
+                    "in vec4 weights;"
                     ""
                     "out vec3 ourColor;"
                     "out vec2 texCoordV;"
                     ""
+                    "const int MAX_BONES = 100;"
+                    ""
                     "uniform mat4 model;"
                     "uniform mat4 view;"
                     "uniform mat4 proj;"
+                    "uniform mat4 gBones[MAX_BONES];"
                     ""
                     "void main() {"
-                    "   gl_Position = proj * view * model * vec4(aPos, 1.0);"
+                    "   mat4 boneTransform = gBones[boneIDs[0]] * weights[0];"
+                    "   boneTransform += gBones[boneIDs[1]] * weights[1];"
+                    "   boneTransform += gBones[boneIDs[2]] * weights[2];"
+                    "   boneTransform += gBones[boneIDs[3]] * weights[3];"
+                    ""
+                    "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
+                    "   gl_Position = proj * view * model * posL;"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -89,7 +101,6 @@ int main() {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
-    glUseProgram(shaderProgram);
     glDeleteShader(VS);
     glDeleteShader(FS);
 
@@ -117,6 +128,8 @@ int main() {
     GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
+    glUseProgram(shaderProgram);
+
     bool running = true;
     while (running) {
         sf::Event event;
@@ -138,6 +151,16 @@ int main() {
                 glm::vec3(0.0f, 0.0f, 1.0f)
         );
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
+
+        std::vector<glm::mat4> Transforms;
+        object.boneTransform(time, Transforms);
+        for (unsigned int i = 0; i < Transforms.size(); ++i)
+        {
+            const std::string name = "gBones[" + std::to_string(i) + "]";
+            GLint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
+            Transforms[i] = glm::transpose(Transforms[i]);
+            glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i]));
+        }
 
         object.draw();
         window.display();
