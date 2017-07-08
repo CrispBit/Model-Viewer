@@ -298,7 +298,8 @@ bool Mesh::initFromScene(const aiScene* pScene) {
             indexs.push_back(fase.mIndices[2]);
         }
 
-        entry->baseVertex = meshy->mNumVertices;
+        //entry->baseVertex = meshy->mNumVertices;
+        entry->baseVertex = 0;
         entry->materialIndex = meshy->mMaterialIndex;
 
         entry->Init(vaortishes, indexs);
