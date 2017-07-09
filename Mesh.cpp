@@ -409,13 +409,11 @@ void Mesh::draw() {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);                 // position
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12); // texture coordinate
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20); // vector normals
+        glVertexAttribIPointer(5, 1, GL_INT, sizeof(Vertex), (const GLvoid*)60);
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->bVB);
-        glVertexAttribIPointer(3, 4, GL_INT, sizeof(Vertex), (const GLvoid*)36); // bones
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)52); // bone weights
-
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
-        glVertexAttribIPointer(5, 1, GL_INT, sizeof(Vertex), (const GLvoid*)56);
+        glVertexAttribIPointer(3, 4, GL_UNSIGNED_INT, sizeof(Vertex), (const GLvoid*)32); // bone ids
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)44); // bone weights
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IB);
 
