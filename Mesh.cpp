@@ -283,6 +283,8 @@ void Mesh::VertexBoneData::addBoneData(unsigned int boneID, float weight)
 
 bool Mesh::initFromScene(const aiScene* pScene) {
     m_Entries.resize(pScene->mNumMeshes);
+    m_boneInfo.resize(pScene->mNumMeshes);
+    m_boneMapping.resize(pScene->mNumMeshes);
 
     unsigned int numVertices = 0;
 
@@ -294,8 +296,8 @@ bool Mesh::initFromScene(const aiScene* pScene) {
     }
 
     for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
-        m_boneInfo.push_back({});
-        m_boneMapping.push_back({});
+        m_boneInfo.push_back(std::vector<BoneInfo>());
+        m_boneMapping.push_back(std::map<std::string, unsigned int>());
 
         aiMesh* meshy = pScene->mMeshes[i];
         std::vector<Vertex> vaortishes;
