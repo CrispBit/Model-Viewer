@@ -150,6 +150,8 @@ int main() {
                 } else if (event.type == sf::Event::Resized) {
                     // adjust the viewport when the window is resized
                     glViewport(0, 0, event.size.width, event.size.height);
+                    proj = glm::perspective(glm::radians(100.0f), (float) event.size.width / (float) event.size.height, 1.0f, 10.0f);
+                    glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
                 } else if (event.type == sf::Event::LostFocus) {
                         active = false;
                 } else if (event.type == sf::Event::GainedFocus) {
