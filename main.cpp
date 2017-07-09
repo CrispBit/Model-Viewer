@@ -59,7 +59,7 @@ int main() {
                     "   boneTransform += gBones[boneIDs[3]] * weights[3];"
                     ""
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = boneTransform * proj * view * model * vec4(aPos, 1.0);"
+                    "   gl_Position = proj * view * model * vec4(aPos, 1.0);"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -135,16 +135,23 @@ int main() {
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
     bool running = true;
+    bool active = true;
     while (running) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                // end the program
-                running = false;
-            } else if (event.type == sf::Event::Resized) {
-                // adjust the viewport when the window is resized
-                glViewport(0, 0, event.size.width, event.size.height);
-            }
+            do {
+                if (event.type == sf::Event::Closed) {
+                    // end the program
+                    running = false;
+                } else if (event.type == sf::Event::Resized) {
+                    // adjust the viewport when the window is resized
+                    glViewport(0, 0, event.size.width, event.size.height);
+                } else if (event.type == sf::Event::LostFocus) {
+                        active = false;
+                } else if (event.type == sf::Event::GainedFocus) {
+                    active = true;
+                }
+            } while (!active && window.waitEvent(event));
         }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
