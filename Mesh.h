@@ -39,7 +39,7 @@ public:
     Mesh();
     ~Mesh() {};
 
-    glm::mat4 boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
+    void boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
     bool loadMesh(const std::string& path);
     bool initFromScene(const aiScene* pScene);
     void draw();
@@ -59,9 +59,8 @@ private:
     const aiScene* m_pScene;
     Assimp::Importer m_importer;
     aiMatrix4x4 m_GlobalInverseTransform;
-    std::map<std::string, unsigned int> m_boneMapping;
+    std::vector<std::map<std::string, unsigned int>> m_boneMapping;
 
-    unsigned int m_numBones = 0;
     struct VertexBoneData
     {
         unsigned int ids[4];
@@ -98,7 +97,7 @@ private:
         glm::mat4 finalTransformation;
     };
 
-    std::vector<BoneInfo> m_boneInfo;
+    std::vector<std::vector<BoneInfo>> m_boneInfo;
     glm::mat4 m_globalInverseTransform;
 
     std::vector<std::unique_ptr<MeshEntry>> m_Entries;
