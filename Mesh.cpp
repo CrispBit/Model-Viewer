@@ -276,7 +276,7 @@ void Mesh::VertexBoneData::addBoneData(unsigned int boneID, float weight)
         }
     }
 
-    // ignore rest of bones
+    std::cout << "warning: more bones than supported" << std::endl;
 }
 
 bool Mesh::initFromScene(const aiScene* pScene) {
