@@ -201,49 +201,47 @@ void Mesh::calcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const 
     Out = Start + Factor * Delta;
 }
 
-void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
+void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform, unsigned int mID)
 {
-    for (unsigned int j = 0; j < m_Entries.size(); j++) {
-        std::string NodeName(pNode->mName.data);
+    std::string NodeName(pNode->mName.data);
 
-        const aiAnimation *pAnimation = m_pScene->mAnimations[0]; // TODO
+    const aiAnimation *pAnimation = m_pScene->mAnimations[0]; // TODO
 
-        glm::mat4 nodeTransformation(aiMatrix4x4ToGlm(&pNode->mTransformation));
+    glm::mat4 nodeTransformation(aiMatrix4x4ToGlm(&pNode->mTransformation));
 
-        const aiNodeAnim *pNodeAnim = findNodeAnim(pAnimation, NodeName);
+    const aiNodeAnim *pNodeAnim = findNodeAnim(pAnimation, NodeName);
 
-        if (pNodeAnim) {
-            // Interpolate scaling and generate scaling transformation matrix
-            aiVector3D Scaling;
-            calcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-            glm::mat4 ScalingM = glm::scale(glm::vec3(Scaling.x, Scaling.y, Scaling.z));
+    if (pNodeAnim) {
+        // Interpolate scaling and generate scaling transformation matrix
+        aiVector3D Scaling;
+        calcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+        glm::mat4 ScalingM = glm::scale(glm::vec3(Scaling.x, Scaling.y, Scaling.z));
 
-            // Interpolate rotation and generate rotation transformation matrix
-            aiQuaternion RotationQ;
-            calcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-            const aiMatrix4x4t<float> tempMat(RotationQ.GetMatrix());
-            glm::mat4 RotationM = aiMatrix4x4ToGlm(&tempMat);
+        // Interpolate rotation and generate rotation transformation matrix
+        aiQuaternion RotationQ;
+        calcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
+        const aiMatrix4x4t<float> tempMat(RotationQ.GetMatrix());
+        glm::mat4 RotationM = aiMatrix4x4ToGlm(&tempMat);
 
-            // Interpolate translation and generate translation transformation matrix
-            aiVector3D Translation;
-            calcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-            glm::mat4 TranslationM = glm::translate(glm::vec3(Translation.x, Translation.y, Translation.z));
+        // Interpolate translation and generate translation transformation matrix
+        aiVector3D Translation;
+        calcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+        glm::mat4 TranslationM = glm::translate(glm::vec3(Translation.x, Translation.y, Translation.z));
 
-            // Combine the above transformations
-            nodeTransformation = TranslationM * RotationM * ScalingM;
-        }
+        // Combine the above transformations
+        nodeTransformation = TranslationM * RotationM * ScalingM;
+    }
 
-        glm::mat4 GlobalTransformation = ParentTransform * nodeTransformation;
+    glm::mat4 GlobalTransformation = ParentTransform * nodeTransformation;
 
-        if (m_boneMapping[j].find(NodeName) != m_boneMapping[j].end()) {
-            unsigned int boneIndex = m_boneMapping[j][NodeName];
-            m_boneInfo[j][boneIndex].finalTransformation = m_globalInverseTransform * GlobalTransformation *
-                                                        m_boneInfo[j][boneIndex].boneOffset;
-        }
+    if (m_boneMapping[mID].find(NodeName) != m_boneMapping[mID].end()) {
+        unsigned int boneIndex = m_boneMapping[mID][NodeName];
+        m_boneInfo[mID][boneIndex].finalTransformation = m_globalInverseTransform * GlobalTransformation *
+                                                    m_boneInfo[mID][boneIndex].boneOffset;
+    }
 
-        for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-            ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
-        }
+    for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
+        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation, mID);
     }
 }
 
@@ -257,7 +255,7 @@ void Mesh::boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms
         float TimeInTicks = TimeInSeconds * TicksPerSecond;
         float AnimationTime = fmod(TimeInTicks, m_pScene->mAnimations[0]->mDuration);
 
-        ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);
+        ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity, j);
 
         const unsigned int m_numBones = m_pScene->mMeshes[j]->mNumBones;
         Transforms.resize(m_numBones);

@@ -50,7 +50,7 @@ private:
     unsigned int findPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
     void calcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void calcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform);
+    void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform, unsigned int mID);
     unsigned int findScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     void calcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     const aiNodeAnim* findNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
