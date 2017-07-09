@@ -24,10 +24,11 @@ struct Vertex
     glm::vec3 m_pos;
     glm::vec2 m_tex;
     glm::vec3 m_normal;
+    GLuint mID;
 
     Vertex() {}
 
-    Vertex(const glm::vec3& pos, const glm::vec2& tex, const glm::vec3& normal) : m_pos(pos), m_tex(tex), m_normal(normal)
+    Vertex(const glm::vec3& pos, const glm::vec2& tex, const glm::vec3& normal, const GLuint& mID) : m_pos(pos), m_tex(tex), m_normal(normal), mID(mID)
     {
         // do nothing
     }
@@ -39,7 +40,7 @@ public:
     Mesh();
     ~Mesh() {};
 
-    void boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
+    void boneTransform(float TimeInSeconds, std::vector<std::vector<glm::mat4>>& Transforms);
     bool loadMesh(const std::string& path);
     bool initFromScene(const aiScene* pScene);
     void draw();

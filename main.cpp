@@ -41,25 +41,28 @@ int main() {
                     "in vec3 normal;"
                     "in ivec4 boneIDs;"
                     "in vec4 weights;"
+                    "in int mID;"
                     ""
                     "out vec3 ourColor;"
                     "out vec2 texCoordV;"
                     ""
-                    "const int MAX_BONES = 100;"
+                    "const int MAX_BONES = 4;"
+                    "const int MAX_MESHES = 100;"
                     ""
                     "uniform mat4 model;"
                     "uniform mat4 view;"
                     "uniform mat4 proj;"
-                    "uniform mat4 gBones[MAX_BONES];"
+                    "uniform mat4 gBones[MAX_MESHES * MAX_BONES];"
                     ""
                     "void main() {"
-                    "   mat4 boneTransform = gBones[boneIDs[0]] * weights[0];"
-                    "   boneTransform += gBones[boneIDs[1]] * weights[1];"
-                    "   boneTransform += gBones[boneIDs[2]] * weights[2];"
-                    "   boneTransform += gBones[boneIDs[3]] * weights[3];"
+                    "   int id = mID * MAX_MESHES;"
+                    "   mat4 boneTransform = gBones[id + boneIDs[0]] * weights[0];"
+                    "   boneTransform += gBones[id + boneIDs[1]] * weights[1];"
+                    "   boneTransform += gBones[id + boneIDs[2]] * weights[2];"
+                    "   boneTransform += gBones[id + boneIDs[3]] * weights[3];"
                     ""
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * model * vec4(aPos, 1.0);"
+                    "   gl_Position = proj * view * model * posL;"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -110,6 +113,7 @@ int main() {
     glBindAttribLocation(shaderProgram, 2, "normal");
     glBindAttribLocation(shaderProgram, 3, "boneIDs");
     glBindAttribLocation(shaderProgram, 4, "weights");
+    glBindAttribLocation(shaderProgram, 5, "mID");
 
     glUseProgram(shaderProgram);
 
@@ -163,13 +167,15 @@ int main() {
         );
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
-        std::vector<glm::mat4> Transforms;
+        std::vector<std::vector<glm::mat4>> Transforms;
         object.boneTransform(time, Transforms);
         for (unsigned int i = 0; i < Transforms.size(); ++i) {
-            const std::string name = "gBones[" + std::to_string(i) + "]";
-            GLuint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
-            Transforms[i] = glm::transpose(Transforms[i]);
-            glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i]));
+            for (unsigned int j = 0; j < Transforms[i].size(); j++) {
+                const std::string name = "gBones[" + std::to_string(i * 4 + j) + "]"; // every transform is for a different bone
+                GLuint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
+                Transforms[i][j] = glm::transpose(Transforms[i][j]);
+                glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i][j]));
+            }
         }
 
         object.draw();

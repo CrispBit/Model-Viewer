@@ -245,9 +245,11 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm
     }
 }
 
-void Mesh::boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms)
+void Mesh::boneTransform(float TimeInSeconds, std::vector<std::vector<glm::mat4>>& Transforms)
 {
+    Transforms.resize(100); // 100 is max meshes
     for (unsigned int j = 0; j < m_Entries.size(); j++) {
+        Transforms[j].resize(4); // 4 is max bones
         glm::mat4 Identity = glm::mat4(1.0); // 1.0 is redundant but was added for understanding
 
         float TicksPerSecond = m_pScene->mAnimations[0]->mTicksPerSecond != 0 ?
@@ -257,11 +259,11 @@ void Mesh::boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms
 
         ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity, j);
 
-        const unsigned int m_numBones = m_pScene->mMeshes[j]->mNumBones;
-        Transforms.resize(m_numBones);
+        unsigned int m_numBones = m_pScene->mMeshes[j]->mNumBones > 4;
+        if (m_numBones > 4) m_numBones = 4;
 
         for (unsigned int i = 0; i < m_numBones; i++) {
-            Transforms[i] = m_boneInfo[j][i].finalTransformation;
+            Transforms[j][i] = m_boneInfo[j][i].finalTransformation;
         }
     }
 }
@@ -309,8 +311,9 @@ bool Mesh::initFromScene(const aiScene* pScene) {
             const aiVector3D &tc = meshy->HasTextureCoords(0) ? meshy->mTextureCoords[0][j] : aiVector3D(0,0,0);
             vaortishes.push_back(Vertex(glm::vec3(potato.x, potato.y, potato.z),
                                         glm::vec2(tc.x, tc.y),
-                                        glm::vec3(n.x, n.y, n.z)
-            ));
+                                        glm::vec3(n.x, n.y, n.z),
+                                        i)
+            );
         }
 
         for (unsigned int j = 0; j < meshy->mNumFaces; ++j) {
@@ -398,6 +401,7 @@ void Mesh::draw() {
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
+    glEnableVertexAttribArray(5);
 
     for (const auto &mesh : m_Entries) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
@@ -410,12 +414,16 @@ void Mesh::draw() {
         glVertexAttribIPointer(3, 4, GL_INT, sizeof(Vertex), (const GLvoid*)36); // bones
         glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)52); // bone weights
 
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
+        glVertexAttribIPointer(5, 1, GL_INT, sizeof(Vertex), (const GLvoid*)56);
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IB);
 
         m_Textures[mesh->materialIndex]->bind(GL_TEXTURE0);
         glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, 0);
     }
 
+    glDisableVertexAttribArray(5);
     glDisableVertexAttribArray(4);
     glDisableVertexAttribArray(3);
     glDisableVertexAttribArray(2);
