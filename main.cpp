@@ -38,12 +38,11 @@ int main() {
             "#version 130\n"
                     "in vec3 aPos;"
                     "in vec2 texCoord;"
-                    "in vec3 normal;"
+                    "in vec3 aNormal;"
+                    "in int mID;"
                     "in ivec4 boneIDs;"
                     "in vec4 weights;"
-                    "in int mID;"
                     ""
-                    "out vec3 ourColor;"
                     "out vec2 texCoordV;"
                     ""
                     "const int MAX_BONES = 4;"
@@ -63,7 +62,7 @@ int main() {
                     "   boneTransform = gBones[5];"
                     ""
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * model * vec4(aPos, 1.0);"
+                    "   gl_Position = proj * view * model * posL;"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -111,10 +110,10 @@ int main() {
 
     glBindAttribLocation(shaderProgram, 0, "aPos");
     glBindAttribLocation(shaderProgram, 1, "texCoord");
-    glBindAttribLocation(shaderProgram, 2, "normal");
-    glBindAttribLocation(shaderProgram, 3, "boneIDs");
-    glBindAttribLocation(shaderProgram, 4, "weights");
-    glBindAttribLocation(shaderProgram, 5, "mID");
+    glBindAttribLocation(shaderProgram, 2, "aNormal");
+    glBindAttribLocation(shaderProgram, 3, "mID");
+    glBindAttribLocation(shaderProgram, 4, "boneIDs");
+    glBindAttribLocation(shaderProgram, 5, "weights");
 
     glUseProgram(shaderProgram);
 

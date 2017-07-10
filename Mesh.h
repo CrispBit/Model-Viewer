@@ -24,11 +24,11 @@ struct Vertex
     glm::vec3 m_pos;
     glm::vec2 m_tex;
     glm::vec3 m_normal;
-    GLint mID;
+    GLuint mID;
 
     Vertex() {}
 
-    Vertex(const glm::vec3& pos, const glm::vec2& tex, const glm::vec3& normal, const GLint& mID) : m_pos(pos), m_tex(tex), m_normal(normal), mID(mID)
+    Vertex(const glm::vec3& pos, const glm::vec2& tex, const glm::vec3& normal, const GLuint& mID) : m_pos(pos), m_tex(tex), m_normal(normal), mID(mID)
     {
         // do nothing
     }
@@ -64,10 +64,10 @@ private:
 
     struct VertexBoneData
     {
-        unsigned int ids[4];
-        float weights[4]; // same length as ids
+        GLuint ids[4];
+        GLfloat weights[4]; // same length as ids
 
-        void addBoneData(unsigned int boneID, float weight);
+        void addBoneData(GLuint boneID, float weight);
 
         VertexBoneData() {
             memset(&ids, 0, sizeof(ids));
