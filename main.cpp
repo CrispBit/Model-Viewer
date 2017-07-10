@@ -59,7 +59,6 @@ int main() {
                     "   boneTransform += gBones[id + boneIDs[1]] * weights[1];"
                     "   boneTransform += gBones[id + boneIDs[2]] * weights[2];"
                     "   boneTransform += gBones[id + boneIDs[3]] * weights[3];"
-                    "   boneTransform = gBones[5];"
                     ""
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
                     "   gl_Position = proj * view * model * posL;"
@@ -175,8 +174,7 @@ int main() {
             for (unsigned int j = 0; j < Transforms[i].size(); j++) {
                 const std::string name = "gBones[" + std::to_string(i * 4 + j) + "]"; // every transform is for a different bone
                 GLuint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
-                //Transforms[i][j] = glm::transpose(Transforms[i][j]);
-                Transforms[i][j] = glm::transpose(glm::mat4());
+                Transforms[i][j] = glm::transpose(Transforms[i][j]);
                 glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i][j]));
             }
         }
