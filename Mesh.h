@@ -24,11 +24,11 @@ struct Vertex
     glm::vec3 m_pos;
     glm::vec2 m_tex;
     glm::vec3 m_normal;
-    GLuint mID;
+    GLint mID;
 
     Vertex() {}
 
-    Vertex(const glm::vec3& pos, const glm::vec2& tex, const glm::vec3& normal, const GLuint& mID) : m_pos(pos), m_tex(tex), m_normal(normal), mID(mID)
+    Vertex(const glm::vec3& pos, const glm::vec2& tex, const glm::vec3& normal, const GLint& mID) : m_pos(pos), m_tex(tex), m_normal(normal), mID(mID)
     {
         // do nothing
     }
