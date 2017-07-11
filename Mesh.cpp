@@ -247,7 +247,7 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm
 
 void Mesh::boneTransform(float TimeInSeconds, std::vector<std::vector<glm::mat4>>& Transforms)
 {
-    Transforms.resize(100); // 100 is max meshes
+    Transforms.resize(m_Entries.size()); // 100 is max meshes
     for (unsigned int j = 0; j < m_Entries.size(); j++) {
         Transforms[j].resize(4); // 4 is max bones
         glm::mat4 Identity = glm::mat4(1.0); // 1.0 is redundant but was added for understanding
@@ -426,7 +426,7 @@ void Mesh::draw() {
 
 const aiNodeAnim* Mesh::findNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
 {
-    for (unsigned int i = 0 ; i < pAnimation->mNumChannels ; i++) {
+    for (unsigned int i = 0 ; i < pAnimation->mNumChannels ; ++i) {
         const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
 
         if (std::string(pNodeAnim->mNodeName.data) == NodeName) {

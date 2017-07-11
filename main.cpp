@@ -58,14 +58,12 @@ int main() {
                     ""
                     "void main() {"
                     "   int id = mID * MAX_BONES;"
-                    "   mat4 boneTransform = mat4(0);"
-                    "   boneTransform += gBones[id + boneIDs[0]] * weights[0];"
+                    "   mat4 boneTransform = gBones[id + boneIDs[0]] * weights[0];"
                     "   boneTransform += gBones[id + boneIDs[1]] * weights[1];"
                     "   boneTransform += gBones[id + boneIDs[2]] * weights[2];"
                     "   boneTransform += gBones[id + boneIDs[3]] * weights[3];"
-                    "   if (boneTransform == mat4(0)) boneTransform = mat4(1);"
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * model * vec4(aPos, 1.0);"
+                    "   gl_Position = proj * view * posL;"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -124,22 +122,21 @@ int main() {
     auto t_start = std::chrono::high_resolution_clock::now();
 
     Mesh object;
-    object.loadMesh("assets/boblampclean.md5mesh");
+    object.loadMesh("assets/Spider_3.fbx");
 
     GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
     glm::mat4 trans;
     auto t_now = std::chrono::high_resolution_clock::now();
 
     glm::mat4 view = glm::lookAt(
-            glm::vec3(4.0f, 7.0f, 4.0f),
+            glm::vec3(4.0f, 4.0f, 4.0f),
             glm::vec3(3.0f, 3.0f, 3.0f),
             glm::vec3(0.0f, 0.0f, 1.0f)
     );
-    view *= glm::scale(glm::vec3(0.1f, 0.1f, 0.1f));
     GLint uniView = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
-    float lookDeg = 90;
+    float lookDeg = 100;
 
     glm::mat4 proj = glm::perspective(glm::radians(lookDeg), 800.0f / 600.0f, 1.0f, 10.0f);
     GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
@@ -179,9 +176,9 @@ int main() {
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
         std::vector<std::vector<glm::mat4>> Transforms;
-        object.boneTransform(time / 1000, Transforms);
+        object.boneTransform(time, Transforms);
         for (unsigned int i = 0; i < Transforms.size(); ++i) {
-            for (unsigned int j = 0; j < Transforms[i].size(); j++) {
+            for (unsigned int j = 0; j < Transforms[i].size(); ++j) {
                 const std::string name = "gBones[" + std::to_string(i * 4 + j) + "]"; // every transform is for a different bone
                 GLint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
                 Transforms[i][j] = glm::transpose(Transforms[i][j]);
