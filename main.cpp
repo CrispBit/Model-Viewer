@@ -130,7 +130,7 @@ int main() {
     auto t_start = std::chrono::high_resolution_clock::now();
 
     Mesh object;
-    object.loadMesh("assets/Spider_3.fbx");
+    object.loadMesh("assets/boblampclean.md5mesh");
 
     GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
     glm::mat4 trans;
@@ -142,16 +142,13 @@ int main() {
             glm::vec3(3.0f, 3.0f, 3.0f),
             glm::vec3(0.0f, 0.0f, 1.0f)
     );
-    view *= glm::scale(glm::vec3(.04f, .04f, .04f));
+    view *= glm::scale(glm::vec3(.06f, .06f, .06f));
     GLint uniView = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
     float lookDeg = 100;
 
-    float zNear = .1;
-    float zFar = 100;
-
-    glm::mat4 proj = glm::perspective(glm::radians(lookDeg), 800.0f / 600.0f, zNear, zFar);
+    glm::mat4 proj = glm::perspective(glm::radians(lookDeg), 800.0f / 600.0f, 1.0f, 10.0f);
     GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
@@ -169,7 +166,7 @@ int main() {
                 } else if (event.type == sf::Event::Resized) {
                     // adjust the viewport when the window is resized
                     glViewport(0, 0, event.size.width, event.size.height);
-                    proj = glm::perspective(glm::radians(lookDeg), (float) event.size.width / (float) event.size.height, zNear, zFar);
+                    proj = glm::perspective(glm::radians(lookDeg), (float) event.size.width / (float) event.size.height, 1.0f, 10.0f);
                     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
                 } else if (event.type == sf::Event::LostFocus) {
                         active = false;
@@ -183,7 +180,7 @@ int main() {
 
         trans = glm::rotate(
                 trans,
-                time * glm::radians(.5f),
+                time * glm::radians(2.0f),
                 glm::vec3(0.0f, 0.0f, 1.0f)
         );
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
