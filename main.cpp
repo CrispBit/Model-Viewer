@@ -58,14 +58,14 @@ int main() {
                     ""
                     "void main() {"
                     "   int id = mID * MAX_BONES;"
-                    "   mat4 boneTransform = mat4(1.0);"
+                    "   mat4 boneTransform = mat4(0);"
                     "   boneTransform += gBones[id + boneIDs[0]] * weights[0];"
                     "   boneTransform += gBones[id + boneIDs[1]] * weights[1];"
                     "   boneTransform += gBones[id + boneIDs[2]] * weights[2];"
                     "   boneTransform += gBones[id + boneIDs[3]] * weights[3];"
-                    ""
+                    "   if (boneTransform == mat4(0)) boneTransform = mat4(1);"
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * model * posL;"
+                    "   gl_Position = proj * view * model * vec4(aPos, 1.0);"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -123,21 +123,24 @@ int main() {
     auto t_start = std::chrono::high_resolution_clock::now();
 
     Mesh object;
-    object.loadMesh("assets/Spider_3.fbx");
+    object.loadMesh("assets/boblampclean.md5mesh");
 
     GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
     glm::mat4 trans;
     auto t_now = std::chrono::high_resolution_clock::now();
 
     glm::mat4 view = glm::lookAt(
-            glm::vec3(4.0f, 4.0f, 4.0f),
+            glm::vec3(4.0f, 7.0f, 4.0f),
             glm::vec3(3.0f, 3.0f, 3.0f),
             glm::vec3(0.0f, 0.0f, 1.0f)
     );
+    view *= glm::scale(glm::vec3(0.1f, 0.1f, 0.1f));
     GLint uniView = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
-    glm::mat4 proj = glm::perspective(glm::radians(100.0f), 800.0f / 600.0f, 1.0f, 10.0f);
+    float lookDeg = 90;
+
+    glm::mat4 proj = glm::perspective(glm::radians(lookDeg), 800.0f / 600.0f, 1.0f, 10.0f);
     GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
@@ -155,7 +158,7 @@ int main() {
                 } else if (event.type == sf::Event::Resized) {
                     // adjust the viewport when the window is resized
                     glViewport(0, 0, event.size.width, event.size.height);
-                    proj = glm::perspective(glm::radians(100.0f), (float) event.size.width / (float) event.size.height, 1.0f, 10.0f);
+                    proj = glm::perspective(glm::radians(lookDeg), (float) event.size.width / (float) event.size.height, 1.0f, 10.0f);
                     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
                 } else if (event.type == sf::Event::LostFocus) {
                         active = false;

@@ -60,14 +60,14 @@ private:
     const aiScene* m_pScene;
     Assimp::Importer m_importer;
     aiMatrix4x4 m_GlobalInverseTransform;
-    std::vector<std::map<std::string, unsigned int>> m_boneMapping;
+    std::vector<std::map<std::string, GLuint>> m_boneMapping;
 
     struct VertexBoneData
     {
         GLuint ids[4];
         GLfloat weights[4]; // same length as ids
 
-        void addBoneData(GLuint boneID, float weight);
+        void addBoneData(GLuint boneID, GLfloat weight);
 
         VertexBoneData() {
             memset(&ids, 0, sizeof(ids));
