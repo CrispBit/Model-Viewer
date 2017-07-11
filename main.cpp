@@ -63,7 +63,7 @@ int main() {
                     "   boneTransform += gBones[id + boneIDs[2]] * weights[2];"
                     "   boneTransform += gBones[id + boneIDs[3]] * weights[3];"
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * posL;"
+                    "   gl_Position = proj * view * model * posL;"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -172,7 +172,7 @@ int main() {
 
         trans = glm::rotate(
                 trans,
-                time * glm::radians(.05f),
+                time * glm::radians(2.0f),
                 glm::vec3(0.0f, 0.0f, 1.0f)
         );
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
