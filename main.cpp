@@ -27,8 +27,11 @@ int main() {
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     int success;
     char infoLog[512];
@@ -55,7 +58,8 @@ int main() {
                     ""
                     "void main() {"
                     "   int id = mID * MAX_BONES;"
-                    "   mat4 boneTransform = gBones[id + boneIDs[0]] * weights[0];"
+                    "   mat4 boneTransform = mat4(1.0);"
+                    "   boneTransform += gBones[id + boneIDs[0]] * weights[0];"
                     "   boneTransform += gBones[id + boneIDs[1]] * weights[1];"
                     "   boneTransform += gBones[id + boneIDs[2]] * weights[2];"
                     "   boneTransform += gBones[id + boneIDs[3]] * weights[3];"
@@ -136,6 +140,8 @@ int main() {
     glm::mat4 proj = glm::perspective(glm::radians(100.0f), 800.0f / 600.0f, 1.0f, 10.0f);
     GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+
+    glClearColor(0.3f, 0.5f, 0.8f, 1.0f);
 
     bool running = true;
     bool active = true;
