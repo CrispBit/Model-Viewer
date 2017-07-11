@@ -247,9 +247,9 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm
 
 void Mesh::boneTransform(float TimeInSeconds, std::vector<std::vector<glm::mat4>>& Transforms)
 {
-    Transforms.resize(m_Entries.size()); // 100 is max meshes
+    Transforms.resize(m_Entries.size()); // 5 is max meshes
     for (unsigned int j = 0; j < m_Entries.size(); j++) {
-        Transforms[j].resize(4); // 4 is max bones
+        Transforms[j].resize(8); // 8 is max bones
         glm::mat4 Identity = glm::mat4(1.0); // 1.0 is redundant but was added for understanding
 
         float TicksPerSecond = m_pScene->mAnimations[0]->mTicksPerSecond != 0 ?
@@ -260,7 +260,7 @@ void Mesh::boneTransform(float TimeInSeconds, std::vector<std::vector<glm::mat4>
         ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity, j);
 
         unsigned int m_numBones = m_pScene->mMeshes[j]->mNumBones;
-        if (m_numBones > 4) m_numBones = 4;
+        if (m_numBones > 8) m_numBones = 8;
 
         for (unsigned int i = 0; i < m_numBones; i++) {
             Transforms[j][i] = m_boneInfo[j][i].finalTransformation;
@@ -398,6 +398,8 @@ void Mesh::draw() {
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
     glEnableVertexAttribArray(5);
+    glEnableVertexAttribArray(6);
+    glEnableVertexAttribArray(7);
 
     for (const auto &mesh : m_Entries) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VB);
@@ -408,7 +410,9 @@ void Mesh::draw() {
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->bVB);
         glVertexAttribIPointer(4, 4, GL_UNSIGNED_INT, sizeof(VertexBoneData), (const GLvoid*)0); // bone ids
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16); // bone weights
+        glVertexAttribIPointer(5, 4, GL_UNSIGNED_INT, sizeof(VertexBoneData), (const GLvoid*)16); // bone ids
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)32); // bone weights
+        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)48); // bone weights
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->IB);
 
@@ -416,6 +420,8 @@ void Mesh::draw() {
         glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, 0);
     }
 
+    glDisableVertexAttribArray(7);
+    glDisableVertexAttribArray(6);
     glDisableVertexAttribArray(5);
     glDisableVertexAttribArray(4);
     glDisableVertexAttribArray(3);

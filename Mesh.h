@@ -64,8 +64,8 @@ private:
 
     struct VertexBoneData
     {
-        GLuint ids[4];
-        GLfloat weights[4]; // same length as ids
+        GLuint ids[8];
+        GLfloat weights[8]; // same length as ids
 
         void addBoneData(GLuint boneID, GLfloat weight);
 
