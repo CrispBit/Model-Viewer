@@ -63,7 +63,7 @@ int main() {
                     "   boneTransform += gBones[id + boneIDs[2]] * weights[2];"
                     "   boneTransform += gBones[id + boneIDs[3]] * weights[3];"
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * model * posL;"
+                    "   gl_Position = proj * view * posL;"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -127,6 +127,7 @@ int main() {
     GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
     glm::mat4 trans;
     auto t_now = std::chrono::high_resolution_clock::now();
+    sf::Clock clock;
 
     glm::mat4 view = glm::lookAt(
             glm::vec3(4.0f, 4.0f, 4.0f),
@@ -177,7 +178,7 @@ int main() {
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
         std::vector<std::vector<glm::mat4>> Transforms;
-        object.boneTransform(time, Transforms);
+        object.boneTransform(clock.getElapsedTime().asSeconds(), Transforms);
         for (unsigned int i = 0; i < Transforms.size(); ++i) {
             for (unsigned int j = 0; j < Transforms[i].size(); ++j) {
                 const std::string name = "gBones[" + std::to_string(i * 4 + j) + "]"; // every transform is for a different bone
