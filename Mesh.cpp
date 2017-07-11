@@ -259,7 +259,7 @@ void Mesh::boneTransform(float TimeInSeconds, std::vector<std::vector<glm::mat4>
 
         ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity, j);
 
-        unsigned int m_numBones = m_pScene->mMeshes[j]->mNumBones > 4;
+        unsigned int m_numBones = m_pScene->mMeshes[j]->mNumBones;
         if (m_numBones > 4) m_numBones = 4;
 
         for (unsigned int i = 0; i < m_numBones; i++) {

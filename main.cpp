@@ -169,11 +169,11 @@ int main() {
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
         std::vector<std::vector<glm::mat4>> Transforms;
-        object.boneTransform(time, Transforms);
+        object.boneTransform(time / 1000, Transforms);
         for (unsigned int i = 0; i < Transforms.size(); ++i) {
             for (unsigned int j = 0; j < Transforms[i].size(); j++) {
                 const std::string name = "gBones[" + std::to_string(i * 4 + j) + "]"; // every transform is for a different bone
-                GLuint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
+                GLint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
                 Transforms[i][j] = glm::transpose(Transforms[i][j]);
                 glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i][j]));
             }
