@@ -101,6 +101,14 @@ int main() {
 
     glAttachShader(shaderProgram, VS);
     glAttachShader(shaderProgram, FS);
+
+    glBindAttribLocation(shaderProgram, 0, "aPos");
+    glBindAttribLocation(shaderProgram, 1, "texCoord");
+    glBindAttribLocation(shaderProgram, 2, "aNormal");
+    glBindAttribLocation(shaderProgram, 3, "mID");
+    glBindAttribLocation(shaderProgram, 4, "boneIDs");
+    glBindAttribLocation(shaderProgram, 5, "weights");
+
     glLinkProgram(shaderProgram);
 
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
@@ -110,13 +118,6 @@ int main() {
     }
     glDeleteShader(VS);
     glDeleteShader(FS);
-
-    glBindAttribLocation(shaderProgram, 0, "aPos");
-    glBindAttribLocation(shaderProgram, 1, "texCoord");
-    glBindAttribLocation(shaderProgram, 2, "aNormal");
-    glBindAttribLocation(shaderProgram, 3, "mID");
-    glBindAttribLocation(shaderProgram, 4, "boneIDs");
-    glBindAttribLocation(shaderProgram, 5, "weights");
 
     glUseProgram(shaderProgram);
 
