@@ -283,8 +283,6 @@ void Mesh::VertexBoneData::addBoneData(GLuint boneID, GLfloat weight)
 }
 
 bool Mesh::initFromScene(const aiScene* pScene) {
-    m_boneMapping.resize(pScene->mNumMeshes, {});
-
     for (unsigned int i = 0; i < pScene->mNumMeshes; i++) {
         std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
         entry->materialIndex = pScene->mMeshes[i]->mMaterialIndex;
