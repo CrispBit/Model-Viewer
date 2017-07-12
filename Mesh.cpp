@@ -371,7 +371,8 @@ void Mesh::draw() {
 
     for (const auto &mesh : m_Entries) {
         m_Textures[mesh->materialIndex]->bind(GL_TEXTURE0);
-        glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, 0);
+        //glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, (GLvoid*)((sizeof(uint) * mesh->baseIndex)));
+        glDrawElementsBaseVertex(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
     }
 
     glBindVertexArray(0);
