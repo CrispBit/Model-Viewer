@@ -270,6 +270,7 @@ void Mesh::boneTransform(float TimeInSeconds, std::vector<std::vector<glm::mat4>
 
 void Mesh::VertexBoneData::addBoneData(GLuint boneID, GLfloat weight)
 {
+    std::cout << sizeof(ids) / sizeof(*ids) << std::endl;
     for (unsigned int i = 0 ; i < sizeof(ids) / sizeof(*ids); ++i) {
         if (weights[i] == 0.0) {
             ids[i]     = boneID;
@@ -282,7 +283,6 @@ void Mesh::VertexBoneData::addBoneData(GLuint boneID, GLfloat weight)
 }
 
 bool Mesh::initFromScene(const aiScene* pScene) {
-    m_boneInfo.resize(pScene->mNumMeshes, {});
     m_boneMapping.resize(pScene->mNumMeshes, {});
 
     for (unsigned int i = 0; i < pScene->mNumMeshes; i++) {
