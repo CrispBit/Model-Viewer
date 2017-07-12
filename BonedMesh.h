@@ -24,7 +24,6 @@ class BonedMesh : public Mesh
 {
 public:
     BonedMesh();
-    ~BonedMesh() {};
 
     void boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
     bool loadMesh(const std::string& path) override;
