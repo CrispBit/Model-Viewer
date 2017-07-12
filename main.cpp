@@ -67,7 +67,7 @@ int main() {
                     "   boneTransform += gBones[eBoneIDs[2]] * eWeights[2];"
                     "   boneTransform += gBones[eBoneIDs[3]] * eWeights[3];"
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * posL;"
+                    "   gl_Position = proj * view * model * posL;"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);

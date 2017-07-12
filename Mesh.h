@@ -86,7 +86,7 @@ enum VB_TYPES {
         glm::mat4 finalTransformation;
     };
 
-    unsigned int numBones;
+    GLuint numBones;
     std::map<std::string, GLuint> m_boneMapping;
     std::vector<BoneInfo> m_boneInfo;
     glm::mat4 m_globalInverseTransform;
