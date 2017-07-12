@@ -7,8 +7,8 @@
 #include <iostream>
 #include "Texture.h"
 
-Texture::Texture(GLenum textureTarget, const std::string& texturePath) : m_textureTarget(textureTarget),
-                                                                         m_texturePath(texturePath) {
+Texture::Texture(GLenum textureTarget, const std::string& texturePath) : m_texturePath(texturePath),
+                                                                         m_textureTarget(textureTarget) {
     // do nothing
 }
 

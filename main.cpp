@@ -42,7 +42,6 @@ int main() {
                     "in vec3 aPos;"
                     "in vec2 texCoord;"
                     "in vec3 aNormal;"
-                    "in int mID;"
                     "in ivec4 boneIDs;"
                     "in ivec4 eBoneIDs;"
                     "in vec4 weights;"
@@ -59,17 +58,16 @@ int main() {
                     "uniform mat4 gBones[MAX_MESHES * MAX_BONES];"
                     ""
                     "void main() {"
-                    "   int id = mID * MAX_BONES;"
-                    "   mat4 boneTransform = gBones[id + boneIDs[0]] * weights[0];"
-                    "   boneTransform += gBones[id + boneIDs[1]] * weights[1];"
-                    "   boneTransform += gBones[id + boneIDs[2]] * weights[2];"
-                    "   boneTransform += gBones[id + boneIDs[3]] * weights[3];"
-                    "   boneTransform += gBones[id + eBoneIDs[0]] * eWeights[0];"
-                    "   boneTransform += gBones[id + eBoneIDs[1]] * eWeights[1];"
-                    "   boneTransform += gBones[id + eBoneIDs[2]] * eWeights[2];"
-                    "   boneTransform += gBones[id + eBoneIDs[3]] * eWeights[3];"
+                    "   mat4 boneTransform = gBones[boneIDs[0]] * weights[0];"
+                    "   boneTransform += gBones[boneIDs[1]] * weights[1];"
+                    "   boneTransform += gBones[boneIDs[2]] * weights[2];"
+                    "   boneTransform += gBones[boneIDs[3]] * weights[3];"
+                    "   boneTransform += gBones[eBoneIDs[0]] * eWeights[0];"
+                    "   boneTransform += gBones[eBoneIDs[1]] * eWeights[1];"
+                    "   boneTransform += gBones[eBoneIDs[2]] * eWeights[2];"
+                    "   boneTransform += gBones[eBoneIDs[3]] * eWeights[3];"
                     "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * model * posL;"
+                    "   gl_Position = proj * view * posL;"
                     "   texCoordV = texCoord;"
                     "}";
     GLuint VS = glCreateShader(GL_VERTEX_SHADER);
@@ -109,11 +107,10 @@ int main() {
     glBindAttribLocation(shaderProgram, 0, "aPos");
     glBindAttribLocation(shaderProgram, 1, "texCoord");
     glBindAttribLocation(shaderProgram, 2, "aNormal");
-    glBindAttribLocation(shaderProgram, 3, "mID");
-    glBindAttribLocation(shaderProgram, 4, "boneIDs");
-    glBindAttribLocation(shaderProgram, 5, "eBoneIDs");
-    glBindAttribLocation(shaderProgram, 6, "weights");
-    glBindAttribLocation(shaderProgram, 7, "eWeights");
+    glBindAttribLocation(shaderProgram, 3, "boneIDs");
+    glBindAttribLocation(shaderProgram, 4, "eBoneIDs");
+    glBindAttribLocation(shaderProgram, 5, "weights");
+    glBindAttribLocation(shaderProgram, 6, "eWeights");
 
     glLinkProgram(shaderProgram);
 
@@ -185,15 +182,13 @@ int main() {
         );
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
-        std::vector<std::vector<glm::mat4>> Transforms;
+        std::vector<glm::mat4> Transforms;
         object.boneTransform(clock.getElapsedTime().asSeconds(), Transforms);
         for (unsigned int i = 0; i < Transforms.size(); ++i) {
-            for (unsigned int j = 0; j < Transforms[i].size(); ++j) {
-                const std::string name = "gBones[" + std::to_string(i * 5 + j) + "]"; // every transform is for a different bone
-                GLint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
-                Transforms[i][j] = glm::transpose(Transforms[i][j]);
-                glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i][j]));
-            }
+            const std::string name = "gBones[" + std::to_string(i) + "]"; // every transform is for a different bone
+            GLint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
+            Transforms[i] = glm::transpose(Transforms[i]);
+            glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i]));
         }
 
         object.draw();
