@@ -12,7 +12,7 @@
 #include <assimp/Importer.hpp>
 #include <chrono>
 
-#include "Mesh.h"
+#include "BonedMesh.h"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
@@ -126,7 +126,7 @@ int main() {
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
-    Mesh object;
+    BonedMesh object;
     object.loadMesh("assets/boblampclean.md5mesh");
 
     GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
