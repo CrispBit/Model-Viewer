@@ -326,12 +326,11 @@ bool Mesh::initFromScene(const aiScene* pScene) {
             if (m_boneMapping[i].find(boneName) == m_boneMapping[i].end()) {
                 boneIndex = j;
                 m_boneInfo[i].push_back(BoneInfo());
+                m_boneMapping[i][boneName] = boneIndex;
+                m_boneInfo[i][boneIndex].boneOffset = aiMatrix4x4ToGlm(&bone->mOffsetMatrix);
             } else {
                 boneIndex = m_boneMapping[i][boneName];
             }
-
-            m_boneMapping[i][boneName] = boneIndex;
-            m_boneInfo[i][boneIndex].boneOffset = aiMatrix4x4ToGlm(&bone->mOffsetMatrix);
 
             for (unsigned int k = 0; k < bone->mNumWeights; ++k) {
                 unsigned int vId = bone->mWeights[k].mVertexId;
