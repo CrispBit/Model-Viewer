@@ -201,7 +201,7 @@ void Mesh::calcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const 
     Out = Start + Factor * Delta;
 }
 
-void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform, unsigned int mID)
+void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform)
 {
     std::string NodeName(pNode->mName.data);
 
@@ -234,35 +234,36 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm
 
     glm::mat4 GlobalTransformation = ParentTransform * nodeTransformation;
 
-    if (m_boneMapping[mID].find(NodeName) != m_boneMapping[mID].end()) {
-        unsigned int boneIndex = m_boneMapping[mID][NodeName];
-        m_boneInfo[mID][boneIndex].finalTransformation = m_globalInverseTransform * GlobalTransformation *
-                                                    m_boneInfo[mID][boneIndex].boneOffset;
+    for (unsigned int mID = 0; mID < m_boneMapping.size(); mID++) {
+        if (m_boneMapping[mID].find(NodeName) != m_boneMapping[mID].end()) {
+            unsigned int boneIndex = m_boneMapping[mID][NodeName];
+            m_boneInfo[mID][boneIndex].finalTransformation = m_globalInverseTransform * GlobalTransformation *
+                                                        m_boneInfo[mID][boneIndex].boneOffset;
+        }
     }
 
     for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation, mID);
+        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
     }
 }
 
 void Mesh::boneTransform(float TimeInSeconds, std::vector<std::vector<glm::mat4>>& Transforms)
 {
     Transforms.resize(m_Entries.size()); // 5 is max meshes
-    for (unsigned int j = 0; j < m_Entries.size(); j++) {
-        Transforms[j].resize(8); // 8 is max bones
-        glm::mat4 Identity = glm::mat4(1.0); // 1.0 is redundant but was added for understanding
+    glm::mat4 Identity = glm::mat4(1.0); // 1.0 is redundant but was added for understanding
 
-        float TicksPerSecond = m_pScene->mAnimations[0]->mTicksPerSecond != 0 ?
+    float TicksPerSecond = m_pScene->mAnimations[0]->mTicksPerSecond != 0 ?
                                m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f;
-        float TimeInTicks = TimeInSeconds * TicksPerSecond;
-        float AnimationTime = fmod(TimeInTicks, m_pScene->mAnimations[0]->mDuration);
+    float TimeInTicks = TimeInSeconds * TicksPerSecond;
+    float AnimationTime = fmod(TimeInTicks, m_pScene->mAnimations[0]->mDuration);
 
-        ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity, j);
+    ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);
 
+    for (unsigned int j = 0; j < m_Entries.size(); ++j) {
         unsigned int m_numBones = m_pScene->mMeshes[j]->mNumBones;
         if (m_numBones > 8) m_numBones = 8;
-
-        for (unsigned int i = 0; i < m_numBones; i++) {
+        Transforms[j].resize(8); // 8 is max bones
+        for (unsigned int i = 0; i < m_numBones; ++i) {
             Transforms[j][i] = m_boneInfo[j][i].finalTransformation;
         }
     }
@@ -283,13 +284,13 @@ void Mesh::VertexBoneData::addBoneData(GLuint boneID, GLfloat weight)
 }
 
 bool Mesh::initFromScene(const aiScene* pScene) {
-    for (unsigned int i = 0; i < pScene->mNumMeshes; i++) {
+    for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
         entry->materialIndex = pScene->mMeshes[i]->mMaterialIndex;
         m_Entries.push_back(std::move(entry));
     }
 
-    for (GLuint i = 0; i < pScene->mNumMeshes; ++i) {
+    for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         m_boneInfo.push_back(std::vector<BoneInfo>());
         m_boneMapping.push_back(std::map<std::string, GLuint>());
 
@@ -333,7 +334,7 @@ bool Mesh::initFromScene(const aiScene* pScene) {
             }
 
             for (unsigned int k = 0; k < bone->mNumWeights; ++k) {
-                unsigned int vId = bone->mWeights[k].mVertexId;
+                GLuint vId = bone->mWeights[k].mVertexId;
                 float weight = bone->mWeights[k].mWeight;
                 bones[vId].addBoneData(boneIndex, weight);
             }
