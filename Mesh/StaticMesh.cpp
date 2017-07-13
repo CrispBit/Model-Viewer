@@ -18,7 +18,7 @@ StaticMesh::MeshEntry::MeshEntry()
     baseVertex = 0;
     baseIndex = 0;
     materialIndex = INVALID_MATERIAL;
-};
+}
 
 StaticMesh::StaticMesh() {
     m_VAO = 0;
@@ -56,10 +56,10 @@ bool StaticMesh::initMaterials(const aiScene* pScene) {
             texturePath = aiString("white.png");
         }
 
-        std::unique_ptr<Texture> texture = std::make_unique<Texture>(GL_TEXTURE_2D, std::string("assets/") + texturePath.C_Str());
-        texture->load();
+        Texture texture(GL_TEXTURE_2D, std::string("assets/") + texturePath.C_Str());
+        texture.load();
 
-        m_Textures[i] = std::move(texture);
+        m_Textures.push_back(std::move(texture));
     }
     return true;
 }
@@ -77,16 +77,16 @@ bool StaticMesh::initFromScene(const aiScene* pScene) {
                  numIndices = 0;
 
     for (unsigned int i = 0; i < m_Entries.size(); ++i) {
-        std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
-        entry->materialIndex = pScene->mMeshes[i]->mMaterialIndex;
-        entry->numIndices = pScene->mMeshes[i]->mNumFaces * 3;
-        entry->baseVertex = numVertices;
-        entry->baseIndex = numIndices;
+        MeshEntry entry = MeshEntry();
+        entry.materialIndex = pScene->mMeshes[i]->mMaterialIndex;
+        entry.numIndices = pScene->mMeshes[i]->mNumFaces * 3;
+        entry.baseVertex = numVertices;
+        entry.baseIndex = numIndices;
         
         numVertices += pScene->mMeshes[i]->mNumVertices;
-        numIndices += entry->numIndices;
+        numIndices += entry.numIndices;
 
-        m_Entries[i] = std::move(entry);
+        m_Entries.push_back(std::move(entry));
     }
 
     positions.reserve(numVertices);
@@ -143,8 +143,8 @@ void StaticMesh::draw() {
     glBindVertexArray(m_VAO);
 
     for (const auto &mesh : m_Entries) {
-        m_Textures[mesh->materialIndex]->bind(GL_TEXTURE0);
-        glDrawElements(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, 0);
+        m_Textures[mesh.materialIndex].bind(GL_TEXTURE0);
+        glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
     }
 
     glBindVertexArray(0);

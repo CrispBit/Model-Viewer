@@ -7,6 +7,7 @@
 #define OGL_STATICMESH_H
 
 #include "IMesh.h"
+#include "Texture.h"
 
 #include <GL/glew.h>
 #include <glm/vec3.hpp>
@@ -15,8 +16,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <vector>
-#include <memory>
-#include "Texture.h"
 
 #define INVALID_OGL_VALUE 0xFFFFFFFF
 
@@ -56,8 +55,8 @@ enum VB_TYPES {
                baseIndex;
     };
 
-    std::vector<std::unique_ptr<MeshEntry>> m_Entries;
-    std::vector<std::unique_ptr<Texture>> m_Textures;
+    std::vector<MeshEntry> m_Entries;
+    std::vector<Texture> m_Textures;
 };
 
 #endif

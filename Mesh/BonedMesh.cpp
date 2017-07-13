@@ -56,10 +56,10 @@ bool BonedMesh::initMaterials(const aiScene* pScene) {
             texturePath = aiString("white.png");
         }
 
-        std::unique_ptr<Texture> texture = std::make_unique<Texture>(GL_TEXTURE_2D, std::string("assets/") + texturePath.C_Str());
-        texture->load();
+        Texture texture(GL_TEXTURE_2D, std::string("assets/") + texturePath.C_Str());
+        texture.load();
 
-        m_Textures[i] = std::move(texture);
+        m_Textures.push_back(std::move(texture));
     }
     return true;
 }
@@ -250,8 +250,8 @@ void BonedMesh::VertexBoneData::addBoneData(GLuint boneID, GLfloat weight)
 }
 
 bool BonedMesh::initFromScene(const aiScene* pScene) {
-    m_Entries.resize(pScene->mNumMeshes);
-    m_Textures.resize(pScene->mNumMaterials);
+    m_Entries.reserve(pScene->mNumMeshes);
+    m_Textures.reserve(pScene->mNumMaterials);
 
     std::vector<glm::vec3> positions;
     std::vector<glm::vec2> texCoords;
@@ -263,16 +263,16 @@ bool BonedMesh::initFromScene(const aiScene* pScene) {
                  numIndices = 0;
 
     for (unsigned int i = 0; i < m_Entries.size(); ++i) {
-        std::unique_ptr<MeshEntry> entry = std::make_unique<MeshEntry>();
-        entry->materialIndex = pScene->mMeshes[i]->mMaterialIndex;
-        entry->numIndices = pScene->mMeshes[i]->mNumFaces * 3;
-        entry->baseVertex = numVertices;
-        entry->baseIndex = numIndices;
+        MeshEntry entry = MeshEntry();
+        entry.materialIndex = pScene->mMeshes[i]->mMaterialIndex;
+        entry.numIndices = pScene->mMeshes[i]->mNumFaces * 3;
+        entry.baseVertex = numVertices;
+        entry.baseIndex = numIndices;
         
         numVertices += pScene->mMeshes[i]->mNumVertices;
-        numIndices += entry->numIndices;
+        numIndices += entry.numIndices;
 
-        m_Entries[i] = std::move(entry);
+        m_Entries.push_back(std::move(entry));
     }
 
     positions.reserve(numVertices);
@@ -319,7 +319,7 @@ bool BonedMesh::initFromScene(const aiScene* pScene) {
             }
 
             for (unsigned int k = 0; k < bone->mNumWeights; ++k) {
-                GLuint vId = m_Entries[i]->baseVertex + bone->mWeights[k].mVertexId;
+                GLuint vId = m_Entries[i].baseVertex + bone->mWeights[k].mVertexId;
                 float weight = bone->mWeights[k].mWeight;
                 boneVertices[vId].addBoneData(boneIndex, weight);
             }
@@ -369,8 +369,8 @@ void BonedMesh::draw() {
     glBindVertexArray(m_VAO);
 
     for (const auto &mesh : m_Entries) {
-        m_Textures[mesh->materialIndex]->bind(GL_TEXTURE0);
-        glDrawElementsBaseVertex(GL_TRIANGLES, mesh->numIndices, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * mesh->baseIndex), mesh->baseVertex);
+        m_Textures[mesh.materialIndex].bind(GL_TEXTURE0);
+        glDrawElementsBaseVertex(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * mesh.baseIndex), mesh.baseVertex);
     }
 
     glBindVertexArray(0);
