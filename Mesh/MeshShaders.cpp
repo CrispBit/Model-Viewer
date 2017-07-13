@@ -24,15 +24,7 @@ void MeshShaders::createStaticShader() {
             "uniform mat4 proj;"
             ""
             "void main() {"
-            "   mat4 boneTransform = gBones[boneIDs[0]] * weights[0];"
-            "   boneTransform += gBones[boneIDs[1]] * weights[1];"
-            "   boneTransform += gBones[boneIDs[2]] * weights[2];"
-            "   boneTransform += gBones[boneIDs[3]] * weights[3];"
-            "   boneTransform += gBones[eBoneIDs[0]] * eWeights[0];"
-            "   boneTransform += gBones[eBoneIDs[1]] * eWeights[1];"
-            "   boneTransform += gBones[eBoneIDs[2]] * eWeights[2];"
-            "   boneTransform += gBones[eBoneIDs[3]] * eWeights[3];"
-            "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
+            "   vec4 posL = vec4(aPos, 1.0);"
             "   gl_Position = proj * view * model * posL;"
             "   texCoordV = texCoord;"
             "}";
@@ -67,16 +59,16 @@ void MeshShaders::createStaticShader() {
         std::cout << "rip shader comperino 2\n" << infoLog << std::endl;
     }
 
-    glAttachShader(bonedMeshShaderProgram, VS);
-    glAttachShader(bonedMeshShaderProgram, FS);
+    glAttachShader(staticMeshShaderProgram, VS);
+    glAttachShader(staticMeshShaderProgram, FS);
 
-    glBindAttribLocation(bonedMeshShaderProgram, 0, "aPos");
-    glBindAttribLocation(bonedMeshShaderProgram, 1, "texCoord");
-    glBindAttribLocation(bonedMeshShaderProgram, 2, "aNormal");
+    glBindAttribLocation(staticMeshShaderProgram, 0, "aPos");
+    glBindAttribLocation(staticMeshShaderProgram, 1, "texCoord");
+    glBindAttribLocation(staticMeshShaderProgram, 2, "aNormal");
 
-    glLinkProgram(bonedMeshShaderProgram);
+    glLinkProgram(staticMeshShaderProgram);
 
-    glGetProgramiv(bonedMeshShaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(staticMeshShaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(staticMeshShaderProgram, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
@@ -178,6 +170,7 @@ void MeshShaders::createBonedShader() {
 }
 
 void MeshShaders::init() {
+    createStaticShader();
     createBonedShader();
     staticMeshShaderProgram = glCreateProgram();
     glEnable(GL_TEXTURE_2D);

@@ -9,12 +9,10 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
-
 class Texture {
 public:
     Texture();
     Texture(GLenum textureTarget, const std::string& fileName);
-    ~Texture() {}
     bool load();
     void bind(GLenum TextureUnit);
 private:

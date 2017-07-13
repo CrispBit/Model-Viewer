@@ -16,7 +16,7 @@ public:
     StaticMesh& put(std::string id, StaticMesh mesh);
     StaticMesh& getStatic(std::string id);
     BonedMesh& getBoned(std::string id);
-    Mesh* get(std::string id);
+    Mesh& get(std::string id);
     bool has(std::string id);
 private:
     std::map<std::string, StaticMesh> staticMeshes;

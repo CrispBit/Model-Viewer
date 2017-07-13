@@ -238,7 +238,6 @@ void BonedMesh::boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Trans
 
 void BonedMesh::VertexBoneData::addBoneData(GLuint boneID, GLfloat weight)
 {
-    std::cout << sizeof(ids) / sizeof(*ids) << std::endl;
     for (unsigned int i = 0 ; i < sizeof(ids) / sizeof(*ids); ++i) {
         if (weights[i] == 0.0) {
             ids[i]     = boneID;

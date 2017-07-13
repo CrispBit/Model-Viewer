@@ -30,10 +30,10 @@ int main() {
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
-    //MeshContainer meshes;
-    BonedMesh object;
-    object.loadMesh("assets/boblampclean.md5mesh");
-    //meshes.put("bob", std::move(object));
+    MeshContainer meshes;
+    BonedMesh tempObject;
+    tempObject.loadMesh("assets/boblampclean.md5mesh");
+    BonedMesh& object = meshes.put("bob", std::move(tempObject));
 
     GLint uniTrans = glGetUniformLocation(*MeshShaders::currentProgram, "model");
     glm::mat4 trans;
@@ -101,6 +101,7 @@ int main() {
         window.display();
     }
 
+    window.setActive(false);
     window.close();
     return 0;
 }

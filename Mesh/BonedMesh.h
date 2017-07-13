@@ -58,15 +58,10 @@ enum VB_TYPES {
     aiMatrix4x4 m_GlobalInverseTransform;
 
     struct VertexBoneData {
-        GLuint ids[8];
-        GLfloat weights[8]; // same length as ids
+        GLuint ids[8] = {0};
+        GLfloat weights[8] = {0}; // same length as ids
 
         void addBoneData(GLuint boneID, GLfloat weight);
-
-        VertexBoneData() {
-            memset(&ids, 0, sizeof(ids));
-            memset(&weights, 0, sizeof(weights));
-        }
     };
 
     struct MeshEntry {
