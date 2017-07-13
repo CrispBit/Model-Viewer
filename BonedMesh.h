@@ -3,8 +3,8 @@
 // From tutorial: http://ogldev.atspace.co.uk/www/tutorial22/tutorial22.html
 //
 
-#ifndef OGL_PRACTICE_MESH_H
-#define OGL_PRACTICE_MESH_H
+#ifndef OGL_MESH_H
+#define OGL_MESH_H
 
 #include "IMesh.h"
 

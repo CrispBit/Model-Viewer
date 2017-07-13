@@ -12,6 +12,7 @@
 #include <assimp/Importer.hpp>
 #include <chrono>
 
+#include "MeshShaders.h"
 #include "BonedMesh.h"
 
 int main() {
@@ -24,112 +25,16 @@ int main() {
 
     window.setActive(true);
 
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_DEPTH_TEST);
-
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    int success;
-    char infoLog[512];
-
-    const GLuint shaderProgram = glCreateProgram();
-    GLchar const* vssource =
-            "#version 130\n"
-                    "in vec3 aPos;"
-                    "in vec2 texCoord;"
-                    "in vec3 aNormal;"
-                    "in ivec4 boneIDs;"
-                    "in ivec4 eBoneIDs;"
-                    "in vec4 weights;"
-                    "in vec4 eWeights;"
-                    ""
-                    "out vec2 texCoordV;"
-                    ""
-                    "const int MAX_BONES = 8;"
-                    "const int MAX_MESHES = 5;"
-                    ""
-                    "uniform mat4 model;"
-                    "uniform mat4 view;"
-                    "uniform mat4 proj;"
-                    "uniform mat4 gBones[MAX_MESHES * MAX_BONES];"
-                    ""
-                    "void main() {"
-                    "   mat4 boneTransform = gBones[boneIDs[0]] * weights[0];"
-                    "   boneTransform += gBones[boneIDs[1]] * weights[1];"
-                    "   boneTransform += gBones[boneIDs[2]] * weights[2];"
-                    "   boneTransform += gBones[boneIDs[3]] * weights[3];"
-                    "   boneTransform += gBones[eBoneIDs[0]] * eWeights[0];"
-                    "   boneTransform += gBones[eBoneIDs[1]] * eWeights[1];"
-                    "   boneTransform += gBones[eBoneIDs[2]] * eWeights[2];"
-                    "   boneTransform += gBones[eBoneIDs[3]] * eWeights[3];"
-                    "   vec4 posL = boneTransform * vec4(aPos, 1.0);"
-                    "   gl_Position = proj * view * model * posL;"
-                    "   texCoordV = texCoord;"
-                    "}";
-    GLuint VS = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(VS, 1, &vssource, NULL);
-    glCompileShader(VS);
-
-    glGetShaderiv(VS, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(VS, 512, NULL, infoLog);
-        std::cout << "rip shader comperino 1\n" << infoLog << std::endl;
-    }
-
-    GLchar const* fssource =
-            "#version 130\n"
-                    "out vec4 FragColor;"
-                    ""
-                    "in vec2 texCoordV;"
-                    ""
-                    "uniform sampler2D ourTexture;"
-                    ""
-                    "void main() {"
-                    "   FragColor = texture(ourTexture, texCoordV);"
-                    "}";
-    GLuint FS = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(FS, 1, &fssource, NULL);
-    glCompileShader(FS);
-
-    glGetShaderiv(FS, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(FS, 512, NULL, infoLog);
-        std::cout << "rip shader comperino 2\n" << infoLog << std::endl;
-    }
-
-    glAttachShader(shaderProgram, VS);
-    glAttachShader(shaderProgram, FS);
-
-    glBindAttribLocation(shaderProgram, 0, "aPos");
-    glBindAttribLocation(shaderProgram, 1, "texCoord");
-    glBindAttribLocation(shaderProgram, 2, "aNormal");
-    glBindAttribLocation(shaderProgram, 3, "boneIDs");
-    glBindAttribLocation(shaderProgram, 4, "eBoneIDs");
-    glBindAttribLocation(shaderProgram, 5, "weights");
-    glBindAttribLocation(shaderProgram, 6, "eWeights");
-
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    glDeleteShader(VS);
-    glDeleteShader(FS);
-
-    glUseProgram(shaderProgram);
+    MeshShaders::init();
+    MeshShaders::currentProgram = &MeshShaders::bonedMeshShaderProgram;
+    glUseProgram(*MeshShaders::currentProgram);
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
     BonedMesh object;
     object.loadMesh("assets/boblampclean.md5mesh");
 
-    GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
+    GLint uniTrans = glGetUniformLocation(*MeshShaders::currentProgram, "model");
     glm::mat4 trans;
     auto t_now = std::chrono::high_resolution_clock::now();
     sf::Clock clock;
@@ -137,16 +42,16 @@ int main() {
     glm::mat4 view = glm::lookAt(
             glm::vec3(4.0f, 4.0f, 4.0f),
             glm::vec3(3.0f, 3.0f, 3.0f),
-            glm::vec3(0.0f, 0.0f, 1.0f)
+            glm::vec3(0.0f, 1.0f, 0.0f)
     );
     view *= glm::scale(glm::vec3(.06f, .06f, .06f));
-    GLint uniView = glGetUniformLocation(shaderProgram, "view");
+    GLint uniView = glGetUniformLocation(*MeshShaders::currentProgram, "view");
     glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
     float lookDeg = 100;
 
     glm::mat4 proj = glm::perspective(glm::radians(lookDeg), 800.0f / 600.0f, 1.0f, 10.0f);
-    GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
+    GLint uniProj = glGetUniformLocation(*MeshShaders::currentProgram, "proj");
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
     glClearColor(0.3f, 0.5f, 0.8f, 1.0f);
@@ -178,7 +83,7 @@ int main() {
         trans = glm::rotate(
                 trans,
                 time * glm::radians(2.0f),
-                glm::vec3(0.0f, 0.0f, 1.0f)
+                glm::vec3(0.0f, 1.0f, 0.0f)
         );
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
@@ -186,7 +91,7 @@ int main() {
         object.boneTransform(clock.getElapsedTime().asSeconds(), Transforms);
         for (unsigned int i = 0; i < Transforms.size(); ++i) {
             const std::string name = "gBones[" + std::to_string(i) + "]"; // every transform is for a different bone
-            GLint boneTransform = glGetUniformLocation(shaderProgram, name.c_str());
+            GLint boneTransform = glGetUniformLocation(MeshShaders::bonedMeshShaderProgram, name.c_str());
             Transforms[i] = glm::transpose(Transforms[i]);
             glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i]));
         }
