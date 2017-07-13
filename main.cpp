@@ -12,8 +12,8 @@
 #include <assimp/Importer.hpp>
 #include <chrono>
 
-#include "MeshShaders.h"
-#include "BonedMesh.h"
+#include "Mesh/MeshShaders.h"
+#include "Mesh/BonedMesh.h"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
