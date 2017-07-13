@@ -12,6 +12,7 @@
 #include <assimp/Importer.hpp>
 #include <chrono>
 
+#include "Mesh/MeshContainer.h"
 #include "Mesh/MeshShaders.h"
 #include "Mesh/BonedMesh.h"
 
@@ -31,8 +32,10 @@ int main() {
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
-    BonedMesh object;
-    object.loadMesh("assets/boblampclean.md5mesh");
+    MeshContainer meshes;
+    meshes.put("bob", BonedMesh());
+
+    meshes.get("bob")->loadMesh("assets/boblampclean.md5mesh");
 
     GLint uniTrans = glGetUniformLocation(*MeshShaders::currentProgram, "model");
     glm::mat4 trans;
@@ -88,7 +91,7 @@ int main() {
         glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(trans));
 
         std::vector<glm::mat4> Transforms;
-        object.boneTransform(clock.getElapsedTime().asSeconds(), Transforms);
+        meshes.getBoned("bob").boneTransform(clock.getElapsedTime().asSeconds(), Transforms);
         for (unsigned int i = 0; i < Transforms.size(); ++i) {
             const std::string name = "gBones[" + std::to_string(i) + "]"; // every transform is for a different bone
             GLint boneTransform = glGetUniformLocation(MeshShaders::bonedMeshShaderProgram, name.c_str());
@@ -96,7 +99,7 @@ int main() {
             glUniformMatrix4fv(boneTransform, 1, GL_TRUE, glm::value_ptr(Transforms[i]));
         }
 
-        object.draw();
+        meshes.get("bob")->draw();
         window.display();
     }
 

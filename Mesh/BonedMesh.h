@@ -3,8 +3,8 @@
 // From tutorial: http://ogldev.atspace.co.uk/www/tutorial22/tutorial22.html
 //
 
-#ifndef OGL_MESH_H
-#define OGL_MESH_H
+#ifndef OGL_BONEDMESH_H
+#define OGL_BONEDMESH_H
 
 #include "IMesh.h"
 
@@ -15,7 +15,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <vector>
-#include <memory>
 #include "Texture.h"
 
 #define INVALID_OGL_VALUE 0xFFFFFFFF

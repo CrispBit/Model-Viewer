@@ -2,10 +2,14 @@
 // Created by cilan on 7/6/2017.
 //
 
+#include "Texture.h"
 #include <GL/glew.h>
 #include <SFML/OpenGL.hpp>
 #include <iostream>
-#include "Texture.h"
+
+Texture::Texture() {
+    // do nothing
+}
 
 Texture::Texture(GLenum textureTarget, const std::string& texturePath) : m_texturePath(texturePath),
                                                                          m_textureTarget(textureTarget) {
@@ -16,7 +20,6 @@ bool Texture::load() {
     if (!imageData.loadFromFile(m_texturePath)) {
         std::cout << "Could not load " << m_texturePath << std::endl;
     }
-    std::cout << m_texturePath << std::endl;
 
     glGenTextures(1, &m_textureObj);
     glBindTexture(m_textureTarget, m_textureObj);

@@ -7,6 +7,7 @@
 #define OGL_STATICMESH_H
 
 #include "IMesh.h"
+#include "Texture.h"
 
 #include <GL/glew.h>
 #include <glm/vec3.hpp>
@@ -15,8 +16,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <vector>
-#include <memory>
-#include "Texture.h"
 
 #define INVALID_OGL_VALUE 0xFFFFFFFF
 

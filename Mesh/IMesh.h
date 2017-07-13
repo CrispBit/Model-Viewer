@@ -5,8 +5,8 @@
 #ifndef IMESH_H
 #define IMESH_H
 
-#include <string>
 #include <assimp/scene.h>
+#include <string>
 
 class Mesh
 {
