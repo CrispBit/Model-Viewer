@@ -89,8 +89,8 @@ enum VB_TYPES {
     std::vector<BoneInfo> m_boneInfo;
     glm::mat4 m_globalInverseTransform;
 
-    std::vector<std::unique_ptr<MeshEntry>> m_Entries;
-    std::vector<std::unique_ptr<Texture>> m_Textures;
+    std::vector<MeshEntry> m_Entries;
+    std::vector<Texture> m_Textures;
 };
 
 #endif

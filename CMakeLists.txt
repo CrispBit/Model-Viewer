@@ -3,7 +3,7 @@ project(ogl_practice)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SOURCE_FILES main.cpp Mesh.h Mesh.cpp Texture.h Texture.cpp)
+set(SOURCE_FILES main.cpp Mesh/IMesh.h Mesh/Texture.h Mesh/Texture.cpp Mesh/BonedMesh.h Mesh/BonedMesh.cpp Mesh/StaticMesh.h Mesh/StaticMesh.cpp Mesh/MeshShaders.h Mesh/MeshShaders.cpp Mesh/MeshContainer.h Mesh/MeshContainer.cpp)
 
 add_executable(ogl_practice ${SOURCE_FILES})
 

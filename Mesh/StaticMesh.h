@@ -35,7 +35,6 @@ enum VB_TYPES {
     POS_VB,
     TEXCOORD_VB,
     NORMAL_VB,
-    INDEX_BUFFER,
     NUM_VBs
 };
 
@@ -51,13 +50,11 @@ enum VB_TYPES {
         MeshEntry();
 
         GLuint numIndices,
-               materialIndex,
-               baseVertex,
-               baseIndex;
+               materialIndex;
     };
 
-    std::vector<std::unique_ptr<MeshEntry>> m_Entries;
-    std::vector<std::unique_ptr<Texture>> m_Textures;
+    std::vector<MeshEntry> m_Entries;
+    std::vector<Texture> m_Textures;
 };
 
 #endif
