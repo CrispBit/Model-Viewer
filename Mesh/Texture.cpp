@@ -16,7 +16,6 @@ bool Texture::load() {
     if (!imageData.loadFromFile(m_texturePath)) {
         std::cout << "Could not load " << m_texturePath << std::endl;
     }
-    std::cout << m_texturePath << std::endl;
 
     glGenTextures(1, &m_textureObj);
     glBindTexture(m_textureTarget, m_textureObj);
