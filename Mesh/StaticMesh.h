@@ -15,6 +15,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <boost/filesystem.hpp>
 #include <vector>
 
 #define INVALID_OGL_VALUE 0xFFFFFFFF
@@ -24,7 +25,7 @@ class StaticMesh : public Mesh
 public:
     StaticMesh();
 
-    bool loadMesh(const std::string& path) override;
+    bool loadMesh(const boost::filesystem::path& path) override;
     bool initFromScene(const aiScene* pScene) override;
     void draw() override;
 private:

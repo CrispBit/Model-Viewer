@@ -15,6 +15,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <vector>
+#include <boost/filesystem.hpp>
 #include "Texture.h"
 
 #define INVALID_OGL_VALUE 0xFFFFFFFF
@@ -25,7 +26,7 @@ public:
     BonedMesh();
 
     void boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms);
-    bool loadMesh(const std::string& path) override;
+    bool loadMesh(const boost::filesystem::path& path) override;
     bool initFromScene(const aiScene* pScene) override;
     void draw() override;
 private:

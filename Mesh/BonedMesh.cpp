@@ -25,7 +25,7 @@ BonedMesh::BonedMesh() {
     memset(&m_Buffers, 0, sizeof(m_Buffers)); // m'buffers *tips hat*
 }
 
-bool BonedMesh::loadMesh(const std::string& path) {
+bool BonedMesh::loadMesh(const boost::filesystem::path& path) {
     bool ret = false;
 
     glGenVertexArrays(1, &m_VAO);
@@ -33,7 +33,7 @@ bool BonedMesh::loadMesh(const std::string& path) {
 
     glGenBuffers(sizeof(m_Buffers) / sizeof(*m_Buffers), m_Buffers);
 
-    m_pScene = m_importer.ReadFile(path.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+    m_pScene = m_importer.ReadFile(path.string(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
     if (m_pScene) {
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
