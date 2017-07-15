@@ -25,7 +25,7 @@ class StaticMesh : public Mesh
 public:
     StaticMesh();
 
-    bool loadMesh(const boost::filesystem::path& path) override;
+    bool loadMesh(const boost::filesystem::path relativePath, boost::filesystem::path& assetsDir, std::map<std::string, Texture>& textures) override;
     bool initFromScene(const aiScene* pScene) override;
     void draw() override;
 private:
@@ -54,7 +54,7 @@ enum VB_TYPES {
     };
 
     std::vector<MeshEntry> m_Entries;
-    std::vector<Texture> m_Textures;
+    std::vector<Texture*> m_Textures;
 };
 
 #endif

@@ -25,7 +25,9 @@ BonedMesh::BonedMesh() {
     memset(&m_Buffers, 0, sizeof(m_Buffers)); // m'buffers *tips hat*
 }
 
-bool BonedMesh::loadMesh(const boost::filesystem::path& path) {
+bool BonedMesh::loadMesh(const boost::filesystem::path relativePath, boost::filesystem::path& assetsDir, std::map<std::string, Texture>& textures) {
+    this->assetsDir = &assetsDir;
+    this->textures = &textures;
     bool ret = false;
 
     glGenVertexArrays(1, &m_VAO);
@@ -33,7 +35,7 @@ bool BonedMesh::loadMesh(const boost::filesystem::path& path) {
 
     glGenBuffers(sizeof(m_Buffers) / sizeof(*m_Buffers), m_Buffers);
 
-    m_pScene = m_importer.ReadFile(path.string(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+    m_pScene = m_importer.ReadFile((assetsDir / relativePath).string(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
     if (m_pScene) {
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
@@ -53,13 +55,16 @@ bool BonedMesh::initMaterials(const aiScene* pScene) {
         aiString texturePath;
         pScene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath, NULL, NULL, NULL, NULL, NULL);
         if (std::string(texturePath.C_Str()).empty()) {
-            texturePath = aiString("white.png");
+            texturePath = aiString((*assetsDir / "white.png").string());
         }
 
-        Texture texture = Texture(GL_TEXTURE_2D, std::string("assets/") + texturePath.C_Str());
-        texture.load();
+        if (textures->find(texturePath.C_Str()) == textures->end()) {
+            Texture texture(GL_TEXTURE_2D, (*assetsDir / texturePath.C_Str()).string());
+            texture.load();
+            textures->emplace(texturePath.C_Str(), std::move(texture));
+        }
 
-        m_Textures[i] = std::move(texture);
+        m_Textures[i] = &textures->at(texturePath.C_Str());
     }
     return true;
 }
@@ -221,6 +226,7 @@ void BonedMesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, cons
 
 void BonedMesh::boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms)
 {
+    std::cout << numBones << std::endl;
     Transforms.resize(numBones); // 5 is max meshes
     glm::mat4 Identity = glm::mat4(1.0); // 1.0 is redundant but was added for understanding
 
@@ -369,7 +375,7 @@ void BonedMesh::draw() {
     glBindVertexArray(m_VAO);
 
     for (const auto &mesh : m_Entries) {
-        m_Textures[mesh.materialIndex].bind(GL_TEXTURE0);
+        m_Textures[mesh.materialIndex]->bind(GL_TEXTURE0);
         glDrawElementsBaseVertex(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * mesh.baseIndex), mesh.baseVertex);
     }
 

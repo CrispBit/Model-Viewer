@@ -21,7 +21,13 @@ StaticMesh::StaticMesh() {
     memset(&m_Buffers, 0, sizeof(m_Buffers)); // m'buffers *tips hat*
 }
 
-bool StaticMesh::loadMesh(const boost::filesystem::path& path) {
+bool StaticMesh::loadMesh(const boost::filesystem::path relativePath, boost::filesystem::path& assetsDir, std::map<std::string, Texture>& textures) {
+    if (this->assetsDir == nullptr) {
+        this->assetsDir = &assetsDir;
+    }
+    if (this->textures == nullptr) {
+        this->textures = &textures;
+    }
     bool ret = false;
 
     glGenVertexArrays(1, &m_VAO);
@@ -29,7 +35,7 @@ bool StaticMesh::loadMesh(const boost::filesystem::path& path) {
 
     glGenBuffers(sizeof(m_Buffers) / sizeof(*m_Buffers), m_Buffers);
 
-    m_pScene = m_importer.ReadFile(path.string(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+    m_pScene = m_importer.ReadFile((assetsDir / relativePath).string(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
     if (m_pScene) {
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
@@ -49,13 +55,16 @@ bool StaticMesh::initMaterials(const aiScene* pScene) {
         aiString texturePath;
         pScene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath, NULL, NULL, NULL, NULL, NULL);
         if (std::string(texturePath.C_Str()).empty()) {
-            texturePath = aiString("white.png");
+            texturePath = aiString(assetsDir->string() + "white.png");
         }
 
-        Texture texture = Texture(GL_TEXTURE_2D, std::string("assets/") + texturePath.C_Str());
-        texture.load();
+        if (textures->find(texturePath.C_Str()) == textures->end()) {
+            Texture texture(GL_TEXTURE_2D, (*assetsDir / texturePath.C_Str()).string());
+            texture.load();
+            textures->emplace(texturePath.C_Str(), std::move(texture));
+        }
 
-        m_Textures[i] = std::move(texture);
+        m_Textures[i] = &textures->at(texturePath.C_Str());
     }
     return true;
 }
@@ -137,7 +146,7 @@ void StaticMesh::draw() {
     glBindVertexArray(m_VAO);
 
     for (const auto &mesh : m_Entries) {
-        m_Textures[mesh.materialIndex].bind(GL_TEXTURE0);
+        m_Textures[mesh.materialIndex]->bind(GL_TEXTURE0);
         glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
     }
 
