@@ -226,7 +226,6 @@ void BonedMesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, cons
 
 void BonedMesh::boneTransform(float TimeInSeconds, std::vector<glm::mat4>& Transforms)
 {
-    std::cout << numBones << std::endl;
     Transforms.resize(numBones); // 5 is max meshes
     glm::mat4 Identity = glm::mat4(1.0); // 1.0 is redundant but was added for understanding
 
