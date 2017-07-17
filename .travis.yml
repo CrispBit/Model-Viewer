@@ -33,7 +33,7 @@ install:
     - cd ..
 
     - sudo wget https://github.com/g-truc/glm/archive/0.9.8.4.tar.gz
-    - sudo tar -xzf
+    - sudo tar -xzf 0.9.8.4.tar.gz
     - cd glm-0.9.8.4/cmake
     - cmake .. && make
     - make install
