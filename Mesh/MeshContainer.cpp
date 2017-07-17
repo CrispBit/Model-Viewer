@@ -1,4 +1,5 @@
 #include "MeshContainer.h"
+#include <memory>
 
 MeshContainer::MeshContainer(boost::filesystem::path assetsDir) : assetsDir(assetsDir) {
     // don't do anything
