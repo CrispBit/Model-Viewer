@@ -1,6 +1,7 @@
 language: cpp
 
 before_install:
+    - sudo add-apt-repository ppa:sonkun/sfml
     - sudo apt -qq update
     - sudo apt install libsfml2-dev
     - sudo apt install libboost-filesystem-dev
