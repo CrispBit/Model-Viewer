@@ -1,7 +1,7 @@
 language: cpp
 
 before_install:
-    - sudo add-apt-repository ppa:sonkun/sfml-stable
+    - sudo add-apt-repository -y ppa:sonkun/sfml-stable
     - sudo apt install sfml
     - sudo apt install libboost-filesystem-dev
     - sudo apt install libboost-thread-dev
