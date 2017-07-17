@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 project(ogl_practice)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 set(SOURCE_FILES main.cpp Mesh/IMesh.h Mesh/Texture.h Mesh/Texture.cpp Mesh/BonedMesh.h Mesh/BonedMesh.cpp Mesh/StaticMesh.h Mesh/StaticMesh.cpp Mesh/MeshShaders.h Mesh/MeshShaders.cpp Mesh/MeshContainer.h Mesh/MeshContainer.cpp)
 
