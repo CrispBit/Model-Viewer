@@ -1,35 +1,35 @@
+language: cpp
+
 matrix:
     include:
-      - compiler: gcc
-        addons:
-            apt:
+        - compiler: gcc
+            addons:
+                apt:
+                    sources:
+                        - ubuntu-toolchain-r-test
+                    packages:
+                        - g++-4.9
+            env: COMPILER=g++-4.9
+        - compiler: gcc
+            addons:
+                apt:
                 sources:
                     - ubuntu-toolchain-r-test
                 packages:
-                    - g++-4.9
-        env: COMPILER=g++-4.9
-      - compiler: gcc
-        addons:
-          apt:
-            sources:
-                - ubuntu-toolchain-r-test
-            packages:
-                - g++-5
-      - compiler: clang
-          addons: &clang37
-              apt:
-                  sources: ['llvm-toolchain-precise-3.7', 'ubuntu-toolchain-r-test']
-                  packages: ['clang-3.7']
-              env: COMPILER='clang++-3.7'
+                    - g++-5
+          - compiler: clang
+                addons: &clang37
+                    apt:
+                    sources: ['llvm-toolchain-precise-3.7', 'ubuntu-toolchain-r-test']
+                    packages: ['clang-3.7']
+                env: COMPILER='clang++-3.7'
 
-      - compiler: clang
-          addons: &clang38
-              apt:
-                  sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
-                  packages: ['clang-3.8']
-              env: COMPILER='clang++-3.8'
-
-language: generic
+          - compiler: clang
+                addons: &clang38
+                apt:
+                    sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
+                    packages: ['clang-3.8']
+                env: COMPILER='clang++-3.8'
 
 before_install:
     - sudo apt update
