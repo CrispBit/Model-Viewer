@@ -30,6 +30,12 @@ if (GLEW_FOUND)
     target_link_libraries(ogl_practice ${GLEW_LIBRARIES})
 endif()
 
+find_package(GLM)
+if (GLM_FOUND)
+    include_directories(${GLM_INCLUDE_DIRS})
+    target_link_libraries(ogl_practice ${GLM_FOUND})
+endif()
+
 find_package(ASSIMP)
 if (ASSIMP_FOUND)
     include_directories(${ASSIMP_INCLUDE_DIRS})
