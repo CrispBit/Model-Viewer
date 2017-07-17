@@ -11,7 +11,6 @@ compiler:
     - gcc
 
 install:
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
     - cd /usr/local
     - sudo wget https://www.sfml-dev.org/files/SFML-2.4.2-linux-gcc-64-bit.tar.gz
     - sudo tar -xzf SFML-2.4.2-linux-gcc-64-bit.tar.gz
@@ -53,9 +52,49 @@ script:
 
 addons:
     apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-4.8
-    - g++-4.8
-    - clang
+        sources:
+        # add PPAs with more up-to-date toolchains
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-precise-3.6
+        packages:
+        # install toolchains
+        - gcc-5
+        - g++-5
+        - clang-3.6
+
+matrix:
+    include:
+      - compiler: gcc
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+            packages:
+              - g++-4.9
+        env: COMPILER=g++-4.9
+      - compiler: gcc
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+            packages:
+              - g++-5
+        env: COMPILER=g++-5
+      - compiler: clang
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+              - llvm-toolchain-precise-3.6
+            packages:
+              - clang-3.6
+        env: COMPILER=clang++-3.6
+      - compiler: clang
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+              - llvm-toolchain-precise-3.7
+            packages:
+              - clang-3.7
+        env: COMPILER=clang++-3.7
