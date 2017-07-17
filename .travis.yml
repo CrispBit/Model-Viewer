@@ -1,6 +1,7 @@
 language: cpp
 
 before_install:
+    - sudo apt update
     - sudo apt install libboost-filesystem-dev
     - sudo apt install libboost-thread-dev
     - sudo apt install libassimp-dev
