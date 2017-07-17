@@ -30,13 +30,13 @@ install:
             export PATH=${DEPS_DIR}/cmake/bin:${PATH}
         fi
 
-    - cd ..
-
     - sudo wget https://github.com/g-truc/glm/archive/0.9.8.4.tar.gz
     - sudo tar -xzf 0.9.8.4.tar.gz
     - cd glm-0.9.8.4/cmake
     - cmake .. && make
     - make install
+
+    - cd ..
 
 script:
     - mkdir build
