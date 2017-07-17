@@ -6,7 +6,6 @@ before_install:
     - sudo apt install libboost-thread-dev
     - sudo apt install libassimp-dev
     - sudo apt install libglew-dev
-    - sudo apt install assimp-utils
 
 compiler:
     - gcc
