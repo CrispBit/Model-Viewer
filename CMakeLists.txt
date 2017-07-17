@@ -33,7 +33,7 @@ endif()
 find_package(GLM)
 if (GLM_FOUND)
     include_directories(${GLM_INCLUDE_DIRS})
-    target_link_libraries(ogl_practice ${GLM_FOUND})
+    target_link_libraries(ogl_practice ${GLM_LIBRARIES})
 endif()
 
 find_package(ASSIMP)
