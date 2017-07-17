@@ -11,7 +11,7 @@ compiler:
     - gcc
 
 install:
-	- cd /usr/local
+    - cd /usr/local
     - sudo wget https://www.sfml-dev.org/files/SFML-2.4.2-linux-gcc-64-bit.tar.gz
     - sudo tar -xzf SFML-2.4.2-linux-gcc-64-bit.tar.gz
     - sudo cp -r SFML-2.4.2/include .
