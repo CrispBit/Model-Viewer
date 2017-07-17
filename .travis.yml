@@ -4,7 +4,6 @@ before_install:
     - sudo apt update
     - sudo apt install libboost-filesystem-dev
     - sudo apt install libboost-thread-dev
-    - sudo apt install libassimp-dev
     - sudo apt install libglew-dev
 
 compiler:
@@ -34,6 +33,10 @@ install:
     - cd glm-0.9.8.4/cmake
     - sudo cmake ..
     - sudo make install
+
+    - cd ${DEPS_DIR}
+    - mkdir assimp && cd assimp && wget https://github.com/assimp/assimp/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz
+    - cd v3.3.1.tar.gz && make install
 
     - cd ${TRAVIS_BUILD_DIR}
 
