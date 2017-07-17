@@ -1,38 +1,11 @@
+dist: trusty
+compiler: gcc
 language: cpp
 
-matrix:
-    include:
-        - compiler: gcc
-            addons:
-                apt:
-                    sources:
-                        - ubuntu-toolchain-r-test
-                    packages:
-                        - g++-4.9
-            env: COMPILER=g++-4.9
-        - compiler: gcc
-            addons:
-                apt:
-                sources:
-                    - ubuntu-toolchain-r-test
-                packages:
-                    - g++-5
-          - compiler: clang
-                addons: &clang37
-                    apt:
-                    sources: ['llvm-toolchain-precise-3.7', 'ubuntu-toolchain-r-test']
-                    packages: ['clang-3.7']
-                env: COMPILER='clang++-3.7'
-
-          - compiler: clang
-                addons: &clang38
-                apt:
-                    sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
-                    packages: ['clang-3.8']
-                env: COMPILER='clang++-3.8'
-
 before_install:
-    - sudo apt update
+    # C++14
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo apt-get update -qq
     - sudo apt install libboost-filesystem-dev
     - sudo apt install libboost-thread-dev
     - sudo apt install libglew-dev
@@ -44,6 +17,9 @@ compiler:
     - gcc
 
 install:
+    # C++14
+    - sudo apt-get install -qq g++-6
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
     - cd /usr/local
     - sudo wget https://www.sfml-dev.org/files/SFML-2.4.2-linux-gcc-64-bit.tar.gz
     - sudo tar -xzf SFML-2.4.2-linux-gcc-64-bit.tar.gz
@@ -82,5 +58,3 @@ script:
     - mkdir build
     - cd build
     - ${DEPS_DIR}/cmake/bin/cmake .. && make
-
-
