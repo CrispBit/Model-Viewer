@@ -1,13 +1,13 @@
 language: cpp
 
 before_install:
-    - sudo apt-get update
-    - sudo apt-get install libsfml-dev
-    - sudo apt-get install libboost-filesystem-dev
-    - sudo apt-get install libboost-thread-dev
-    - sudo apt-get install libassimp-dev
-    - sudo apt-get install libglew-dev
-    - sudo apt-get install assimp-utils
+    - sudo apt -qq update
+    - sudo apt install libsfml2-dev
+    - sudo apt install libboost-filesystem-dev
+    - sudo apt install libboost-thread-dev
+    - sudo apt install libassimp-dev
+    - sudo apt install libglew-dev
+    - sudo apt install assimp-utils
 
 compiler:
     - gcc
