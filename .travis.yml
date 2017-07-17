@@ -15,16 +15,14 @@ matrix:
                 - ubuntu-toolchain-r-test
             packages:
                 - g++-5
-      - os: linux
-          compiler: clang
+      - compiler: clang
           addons: &clang37
               apt:
                   sources: ['llvm-toolchain-precise-3.7', 'ubuntu-toolchain-r-test']
                   packages: ['clang-3.7']
               env: COMPILER='clang++-3.7'
 
-      - os: linux
-      compiler: clang
+      - compiler: clang
           addons: &clang38
               apt:
                   sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
