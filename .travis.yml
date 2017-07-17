@@ -6,7 +6,6 @@ before_install:
     - sudo apt install libboost-thread-dev
     - sudo apt install libassimp-dev
     - sudo apt install libglew-dev
-    - sudo apt install libglm-dev
     - sudo apt install assimp-utils
 
 compiler:
@@ -32,6 +31,12 @@ install:
         fi
 
     - cd ..
+
+    - sudo wget https://github.com/g-truc/glm/archive/0.9.8.4.tar.gz
+    - sudo tar -xzf
+    - cd glm-0.9.8.4/cmake
+    - cmake .. && make
+    - make install
 
 script:
     - mkdir build
