@@ -13,7 +13,6 @@ before_install:
 before_script: export CXX=${COMPILER}
 
 compiler:
-    - clang
     - gcc
 
 install:
