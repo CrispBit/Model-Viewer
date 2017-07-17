@@ -36,7 +36,7 @@ install:
 
     - cd ${DEPS_DIR}
     - mkdir assimp && cd assimp && wget https://github.com/assimp/assimp/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz
-    - cd v3.3.1.tar.gz && make install
+    - cd assimp-3.3.1 && make install
 
     - cd ${TRAVIS_BUILD_DIR}
 
