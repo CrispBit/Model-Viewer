@@ -11,8 +11,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <chrono>
 
-#include "Mesh/MeshContainer.h"
-#include "Mesh/MeshShaders.h"
+#include <crispsynth/Mesh/MeshContainer.h>
+#include <crispsynth/Mesh/MeshShaders.h>
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
@@ -30,8 +30,8 @@ int main() {
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
-    MeshContainer meshes("assets");
-    BonedMesh* object = meshes.create("bob", "boblampclean.md5mesh");
+    MeshContainer meshes;
+    BonedMesh* object = meshes.create("", "boblampclean.md5mesh");
 
     GLint uniTrans = glGetUniformLocation(*MeshShaders::currentProgram, "model");
     glm::mat4 trans;
