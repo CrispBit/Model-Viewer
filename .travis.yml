@@ -47,6 +47,7 @@ install:
     - git clone https://github.com/CrispBit/CrispSynth.git
     - cd CrispSynth
     - mkdir cmake && cd cmake
+    - cmake ..
     - make
     - sudo make install
 
