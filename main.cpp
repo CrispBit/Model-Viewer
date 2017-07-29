@@ -9,12 +9,18 @@
 #include <glm/matrix.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <crispsynth/Locator.h>
+#include <crispsynth/resources/LocalResources.h>
+#include <crispsynth/mesh/MeshContainer.h>
+#include <crispsynth/mesh/MeshShaders.h>
+
 #include <chrono>
 
-#include <crispsynth/Mesh/MeshContainer.h>
-#include <crispsynth/Mesh/MeshShaders.h>
+int main(int argc, char** argv) {
+    Locator::provideArgs(argv[0]);
+    Locator::provideResourcesService(std::make_unique<LocalResources>());
 
-int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
     GLenum res = glewInit();
     if (res != GLEW_OK) {
@@ -31,7 +37,7 @@ int main() {
     auto t_start = std::chrono::high_resolution_clock::now();
 
     MeshContainer meshes;
-    BonedMesh* object = meshes.create("", "boblampclean.md5mesh");
+    BonedMesh* object = meshes.create("bob", "boblampclean.md5mesh");
 
     GLint uniTrans = glGetUniformLocation(*MeshShaders::currentProgram, "model");
     glm::mat4 trans;
