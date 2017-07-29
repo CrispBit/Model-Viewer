@@ -43,17 +43,19 @@ install:
     - sudo cmake ..
     - sudo make install
 
+
+
     - cd ${DEPS_DIR}
-    - git clone https://github.com/CrispBit/CrispSynth.git
-    - cd CrispSynth
+    - mkdir assimp && cd assimp && wget https://github.com/assimp/assimp/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz
+    - cd assimp-3.3.1
     - mkdir cmake && cd cmake
     - cmake ..
     - make
     - sudo make install
 
     - cd ${DEPS_DIR}
-    - mkdir assimp && cd assimp && wget https://github.com/assimp/assimp/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz
-    - cd assimp-3.3.1
+    - git clone https://github.com/CrispBit/CrispSynth.git
+    - cd CrispSynth
     - mkdir cmake && cd cmake
     - cmake ..
     - make
