@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 project(ogl_practice)
 
+add_definitions(-DGLEW_STATIC)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
@@ -57,7 +59,7 @@ if (Boost_FOUND)
     target_link_libraries(ogl_practice ${Boost_LIBRARIES})
 endif()
 
-set(CRISPSYNTH_STATIC_LIBRARY TRUE)
+set(CRISPSYNTH_STATIC_LIBRARY ON)
 find_package(CrispSynth REQUIRED)
 if (CRISPSYNTH_FOUND)
     include_directories(${CRISPSYNTH_INCLUDE_DIR})

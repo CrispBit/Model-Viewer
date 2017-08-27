@@ -1,4 +1,3 @@
-#define GLEW_STATIC
 #include <GL/glew.h>
 
 #include <iostream>
@@ -18,15 +17,21 @@
 #include <chrono>
 
 int main(int argc, char** argv) {
-    Locator::provideArgs(argv[0]);
-    Locator::provideResourcesService(std::make_unique<LocalResources>());
-
     sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
-    GLenum res = glewInit();
+    std::cout << "test" << std::endl;
+    return 0;
+    /*GLenum res = glewInit();
     if (res != GLEW_OK) {
         fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
         return 1;
-    }
+    }*/
+    /*
+    Locator::provideArgs(argv[0]);
+    Locator::provideArgs(argv[0]);
+    Locator::provideResourcesService(std::make_unique<LocalResources>());
+
+
+
 
     window.setActive(true);
 
@@ -108,4 +113,5 @@ int main(int argc, char** argv) {
     window.setActive(false);
     window.close();
     return 0;
+     */
 }
