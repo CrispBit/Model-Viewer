@@ -5,6 +5,7 @@ add_definitions(-DGLEW_STATIC)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(SOURCE_FILES main.cpp)
 
@@ -59,6 +60,9 @@ if (Boost_FOUND)
     ADD_DEFINITIONS(-DHAS_BOOST)
     target_link_libraries(ogl_practice ${Boost_LIBRARIES})
 endif()
+
+include_directories(include)
+target_link_libraries(ogl_practice ${CMAKE_DL_LIBS})
 
 set(CRISPSYNTH_STATIC_LIBRARY ON)
 find_package(CrispSynth REQUIRED)

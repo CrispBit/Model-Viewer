@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+#include <crispsynth/OpenGL.h>
 
 #include <iostream>
 #include <SFML/OpenGL.hpp>
@@ -19,19 +19,12 @@
 int main(int argc, char** argv) {
     sf::RenderWindow window(sf::VideoMode(800, 600), "meemerino", sf::Style::Default, sf::ContextSettings(24));
     std::cout << "test" << std::endl;
-    return 0;
-    /*GLenum res = glewInit();
-    if (res != GLEW_OK) {
-        fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
-        return 1;
-    }*/
-    /*
+
+    if (!gladLoadGL()) std::cout << "rip" << std::endl;
+
     Locator::provideArgs(argv[0]);
     Locator::provideArgs(argv[0]);
     Locator::provideResourcesService(std::make_unique<LocalResources>());
-
-
-
 
     window.setActive(true);
 
@@ -113,5 +106,4 @@ int main(int argc, char** argv) {
     window.setActive(false);
     window.close();
     return 0;
-     */
 }
