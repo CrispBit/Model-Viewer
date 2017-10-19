@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 project(ogl_practice)
 
-add_definitions(-DGLEW_STATIC)
-
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_BUILD_TYPE Debug)
@@ -34,13 +32,6 @@ if (OPENGL_FOUND)
     target_link_libraries(ogl_practice ${OPENGL_LIBRARIES})
 endif()
 
-set(GLEW_USE_STATIC_LIBS ON)
-find_package(GLEW REQUIRED)
-if (GLEW_FOUND)
-    include_directories(${GLEW_INCLUDE_DIRS})
-    target_link_libraries(ogl_practice ${GLEW_LIBRARIES})
-endif()
-
 find_package(GLM REQUIRED)
 if (GLM_FOUND)
     include_directories(${GLM_INCLUDE_DIRS})
@@ -53,7 +44,6 @@ if (ASSIMP_FOUND)
     target_link_libraries(ogl_practice ${ASSIMP_LIBRARIES})
 endif()
 
-set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system thread filesystem REQUIRED)
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
