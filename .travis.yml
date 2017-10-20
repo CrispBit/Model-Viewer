@@ -29,6 +29,7 @@ install:
 
     - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
     - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+    - export MAKEFLAGS="-j$(nproc)"
 
     - |
         if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
@@ -56,6 +57,13 @@ install:
     - cd ${DEPS_DIR}
     - git clone https://github.com/CrispBit/CrispSynth.git
     - cd CrispSynth
+    - |
+        patch include/crispsynth/glad/glad.h <<<EOF
+        91c91
+        < #include <KHR/khrplatform.h>
+        ---
+        > #include <crispsynth/KHR/khrplatform.h>
+        EOF
     - mkdir cmake && cd cmake
     - cmake ..
     - make
@@ -66,4 +74,4 @@ install:
 script:
     - mkdir build
     - cd build
-    - ${DEPS_DIR}/cmake/bin/cmake .. && make
+    - cmake .. && make
