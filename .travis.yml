@@ -29,6 +29,7 @@ install:
 
     - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
     - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+    - echo "${nproc} jobs"
     - export MAKEFLAGS="-j$(nproc)"
 
     - |
@@ -58,7 +59,7 @@ install:
     - git clone https://github.com/CrispBit/CrispSynth.git
     - cd CrispSynth
     - |
-        patch include/crispsynth/glad/glad.h <<<EOF
+        patch include/crispsynth/glad/glad.h <<EOF
         91c91
         < #include <KHR/khrplatform.h>
         ---
