@@ -8,6 +8,7 @@ before_install:
     - sudo apt-get update -qq
     - sudo apt install libboost-filesystem-dev
     - sudo apt install libboost-thread-dev
+    - sudo apt install libyaml-cpp-dev
 
 before_script: export CXX=${COMPILER}
 
