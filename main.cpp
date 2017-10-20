@@ -21,6 +21,12 @@ int main(int argc, char** argv) {
     std::cout << "test" << std::endl;
 
     if (!gladLoadGL()) std::cout << "rip" << std::endl;
+    sf::ContextSettings settings = window.getSettings();
+
+    std::cout << "depth bits:" << settings.depthBits << std::endl;
+    std::cout << "stencil bits:" << settings.stencilBits << std::endl;
+    std::cout << "antialiasing level:" << settings.antialiasingLevel << std::endl;
+    std::cout << "version:" << settings.majorVersion << "." << settings.minorVersion << std::endl;
 
     Locator::provideArgs(argv[0]);
     Locator::provideArgs(argv[0]);
