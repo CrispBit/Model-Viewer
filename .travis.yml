@@ -9,6 +9,7 @@ before_install:
     - sudo apt install libboost-filesystem-dev
     - sudo apt install libboost-thread-dev
     - sudo apt install libyaml-cpp-dev
+    - sudo apt install libopenal-dev
 
 before_script: export CXX=${COMPILER}
 
