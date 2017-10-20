@@ -51,7 +51,6 @@ if (Boost_FOUND)
     target_link_libraries(ogl_practice ${Boost_LIBRARIES})
 endif()
 
-include_directories(include)
 target_link_libraries(ogl_practice ${CMAKE_DL_LIBS})
 
 set(CRISPSYNTH_STATIC_LIBRARY ON)
